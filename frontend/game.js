@@ -171,51 +171,36 @@ function getHandCardRect(cardCode) {
   return {left: rect.left, top: rect.top, width: rect.width, height: rect.height};
 }
 
-// ─── Play ─────────────────────────────────────────────────────────────────────
 async function submitPlay(cs, dragSourceRect = null) {
   if (State.isSpectator || State.busy) return;
   State.busy = true; stopTimer(); State.selected = null;
 
-  // After rotation: seat 0 is always us. Absolute seat is State.mySeat.
   State._currentTrickCards[0] = cs;
 
   const isLocalVsAi = !State.isCoop && !State.roomId;
-  // Capture the current card rectangle before renderHand removes it. Dragged
-  // plays pass their precise release point; timer auto-plays use this hand rect.
-  const playOrigin = dragSourceRect || (isLocalVsAi ? getHandCardRect(cs) : null);
+  const playOrigin = dragSourceRect || getHandCardRect(cs);
+  
   State.update({
     your_hand:   (State.data.your_hand||[]).filter(c=>c!==cs),
     human_hand:  (State.data.human_hand||[]).filter(c=>c!==cs),
   });
   renderHand();
 
-  if (isLocalVsAi) {
-    // Do not render the destination card before the flying card arrives.
-    // Previously the card appeared in the trick slot immediately, then a
-    // second animated copy flew over it, which looked like a jump/replay.
-    // The animation now starts at the pointer release position and installs
-    // the stationary trick card exactly once when it lands.
-    await Anim.flyCard(0, cs, false, () => {
-      if (State.data) {
-        if (!Array.isArray(State.data.current_trick)) State.data.current_trick = [null,null,null,null];
-        State.data.current_trick[0] = cs;
-      }
-      renderTrick();
-    }, {fromRect: playOrigin, duration: 340});
-  } else {
-    // Preserve the existing Co-op / room interaction path in this update.
-    State.data.current_trick[0] = cs;
+  // Use the same smooth animation for both VS AI and Multiplayer
+  await Anim.flyCard(0, cs, false, () => {
+    if (State.data) {
+      if (!Array.isArray(State.data.current_trick)) State.data.current_trick = [null,null,null,null];
+      State.data.current_trick[0] = cs;
+    }
     renderTrick();
-    await Anim.flyCard(0, cs, false);
-  }
+  }, {fromRect: playOrigin, duration: 340});
 
   let res;
   try {
     if (State.roomId) {
       // Multiplayer: use socket
       API.getSocket()?.emit("play_card", {card: cs});
-      // Response comes via "game_state" / "game_over" socket events
-      State.busy = false;
+      // Do NOT set State.busy = false here. Wait for the server response.
       return;
     }
     res = State.isCoop
@@ -295,17 +280,10 @@ async function processEntry(e) {
   await sleep(550);
   await Promise.race([
     new Promise((res, rej) =>
-      // In VS AI, a card becomes public as soon as the bot plays it. Animate
-      // the real card face into the trick area instead of flying a card back
-      // and revealing the face only after it lands. Keep the existing Co-op /
-      // room presentation unchanged in this focused VS AI fix.
       Anim.flyCard(e.player, e.card, Boolean(State.isCoop || State.roomId), ()=>{
         try {
-          // VS AI needs the full four-card trick locally to identify multiple
-          // tens captured together. Leave Co-op / room handling unchanged.
-          if (!State.isCoop && !State.roomId) {
-            State._currentTrickCards[e.player] = e.card;
-          }
+          // Record the card for both VS AI and Multiplayer
+          State._currentTrickCards[e.player] = e.card;
           State.data.current_trick[e.player] = e.card;
           renderTrick(); res();
         } catch(err){rej(err);}
@@ -384,17 +362,28 @@ function setupSocketGameHandlers() {
   const sock = API.getSocket();
   if (!sock) return;
 
-  sock.on("game_state", async data => {
+   sock.on("game_state", async data => {
     if (Boolean(data?.is_spectator)) {
       applySpectatorSnapshot(data);
       return;
     }
     State.isSpectator = false;
+
     if (State.busy) {
-      // Queue it
+      // Queue it. State.data is not updated here; processLog will update it.
       await processLog(data);
     } else {
+      // Save the current visual trick BEFORE the server state overwrites it.
+      // This allows processLog to animate the new cards from their previous state.
+      const prevTrick = State.data ? [...State.data.current_trick] : [null,null,null,null];
+      
       State.set(data);
+      
+      // If there are new log entries, restore the visual trick so the animations can play smoothly.
+      if (data.log && data.log.length > State.logShown) {
+        State.data.current_trick = prevTrick;
+      }
+      
       await processLog(data);
     }
   });
