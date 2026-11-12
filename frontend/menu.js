@@ -7,7 +7,7 @@
 let _selectedDiff   = 'medium';
 let _inGame         = false;
 let _menuMusic      = null;
-let _playerName     = localStorage.getItem("indawlchuh_name") || "";
+let _playerName     = "";
 let _currentRoom    = null;
 let _isHost         = false;
 let _isSpectator    = false;
@@ -181,7 +181,6 @@ function confirmName() {
     return;
   }
   _playerName = name;
-  localStorage.setItem("indawlchuh_name", name);
   const callback = _nameEntryCallback;
   _nameEntryCallback = null;
   if (callback) callback(name);
@@ -776,12 +775,18 @@ function _disconnectRoomSocket() {
 
 function _showMenuAfterRoomExit(screen = 'main') {
   if (window.Game?.stopTimer) window.Game.stopTimer();
+  
+  // DESTROY THE NAME HERE
+  _playerName = ""; 
+  
   _disconnectRoomSocket();
   _currentRoom = null;
   _isHost = false;
   _isSpectator = false;
   _inGame = false;
   _updateMobileOrientationGuard();
+  
+  // ... (rest of the function stays exactly the same)
 
   const shell = document.getElementById('game-shell');
   const table = document.getElementById('table');
