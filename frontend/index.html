@@ -237,6 +237,8 @@ window.openIndawlchuhCoopHub = function () {
   <button class="gtb-btn" onclick="Menu.returnToMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
   <span class="diff-badge" id="diff-badge-label"></span>
   <div id="controls-inline"><select id="diff-select" class="gtb-select"><option value="easy">Easy</option><option value="medium" selected>Medium</option><option value="hard">Hard</option></select><select id="timer-select" class="gtb-select"><option value="0">No timer</option><option value="15">15s</option><option value="20" selected>20s</option><option value="30">30s</option></select><button class="gtb-btn gold" onclick="Game.newGame()">New</button><button class="gtb-btn" onclick="Game.getHint()">Hint</button></div>
+    <div id="status-inline" style="flex:1; text-align:center; display:flex; justify-content:center; align-items:center; font-size:14px; font-weight:600;"></div>
+  <button id="give-up-btn" onclick="Game.onGiveUp()" style="display:none; margin-right:8px; padding:5px 10px; border-radius:6px; background:rgba(200,60,60,.2); border:1px solid rgba(200,60,60,.5); color:#e07070;">🏳 Concede</button>
   <button id="social-btn" class="gtb-btn" onclick="Game.toggleSocialPanel()" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
 </div>
 <div id="social-panel"></div>
@@ -292,8 +294,6 @@ window.openIndawlchuhCoopHub = function () {
     <div class="bottom-row-top">
       <div class="pchip pchip-you"><span class="pc-name" id="pname-you">You</span><span class="pc-cnt" id="cnt-you">13</span></div>
       <button id="room-change-seat-btn" type="button" onclick="Menu.openSeatChange()" style="display:none">↔ Change Seat</button>
-      <div id="status-inline"></div>
-      <button id="give-up-btn" onclick="Game.onGiveUp()" style="display:none">🏳 Concede</button>
       <button class="rl-start-btn" id="room-start-btn" onclick="Menu.hostStartGame()" style="display:none; width: auto; padding: 5px 15px; margin-left:10px;">▶ Start Game</button>
     </div>
     <div id="hand-scroll"><div id="hand-row"></div></div>
