@@ -226,14 +226,15 @@ async function processLog(data) {
   const serverLog  = data.log || [];
   const newEntries = serverLog.slice(State.logShown);
 
-  if (!newEntries.length) {
-    syncScalars(data);
-    State.busy = false;
+ if (!newEntries.length) {
+  syncScalars(data);
+  if (!State.busy) {
     renderAll(); renderGiveUpButton();
     if (data.phase==="done" && data.score) { await sleep(500); showScore(data.score, data.conceded); }
     else if (data.whose_turn === 0) startTimer();
-    return;
   }
+  return;
+}
 
   State.busy = true; // <--- ADD THIS LINE
   State.logShown += newEntries.length;
@@ -278,7 +279,7 @@ async function processEntry(e) {
     }
     renderTrick(); return;
   }
-  await sleep(550);
+  await sleep(200);
   await Promise.race([
     new Promise((res, rej) =>
       Anim.flyCard(e.player, e.card, Boolean(State.isCoop || State.roomId), ()=>{
@@ -376,14 +377,9 @@ function setupSocketGameHandlers() {
     } else {
       // Save the current visual trick BEFORE the server state overwrites it.
       // This allows processLog to animate the new cards from their previous state.
-      const prevTrick = State.data ? [...State.data.current_trick] : [null,null,null,null];
-      
+     const prevTrick = State.data ? [...State.data.current_trick] : [null,null,null,null];
       State.set(data);
-      
-      // If there are new log entries, restore the visual trick so the animations can play smoothly.
-      if (data.log && data.log.length > State.logShown) {
-        State.data.current_trick = prevTrick;
-      }
+      State.data.current_trick = prevTrick; // ALWAYS restore to prevent instant overlap
       
       await processLog(data);
     }
