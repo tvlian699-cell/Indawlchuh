@@ -31,9 +31,22 @@ function initMenuMusic() {
 function playMenuMusic() {
   initMenuMusic();
   if (!_menuMusic) return;
-  _menuMusic.play().catch(() =>
-    document.addEventListener("pointerdown", () => _menuMusic.play().catch(() => {}), { once: true })
-  );
+  
+  const playAttempt = _menuMusic.play();
+  if (playAttempt !== undefined) {
+    playAttempt.catch(() => {
+      // Autoplay is blocked by the phone. Unlock on the very first user tap.
+      const unlockAudio = () => {
+        if (_menuMusic && _menuMusic.paused) {
+          _menuMusic.play().catch(() => {});
+        }
+        document.removeEventListener('pointerdown', unlockAudio);
+        document.removeEventListener('touchstart', unlockAudio);
+      };
+      document.addEventListener('pointerdown', unlockAudio);
+      document.addEventListener('touchstart', unlockAudio);
+    });
+  }
 }
 
 function stopMenuMusic() {
@@ -55,14 +68,13 @@ function _isPhoneDevice() {
 }
 
 function _updateMobileOrientationGuard() {
-  const active = !!_currentRoom || _inGame;
   const phone = _isPhoneDevice();
   const portrait = window.matchMedia?.("(orientation: portrait)").matches ||
     (window.innerHeight > window.innerWidth);
   const overlay = document.getElementById("mobile-rotate-overlay");
-  const show = active && phone && portrait;
+  const show = phone && portrait;
   if (overlay) overlay.classList.toggle("visible", show);
-  document.body.classList.toggle("mobile-room-mode", active && phone);
+  document.body.classList.toggle("mobile-room-mode", phone);
 }
 
 function _requestMobileLandscape() {
@@ -112,6 +124,10 @@ function showScreen(name) {
 
 showScreen('main');
 playMenuMusic();
+// Lock the phone into landscape mode on the very first tap anywhere
+document.addEventListener('pointerdown', () => {
+  if (_isPhoneDevice()) _requestMobileLandscape();
+}, { once: true });
 
 // ─── Utility ──────────────────────────────────────────────────────────────────
 function _shake(el) {
