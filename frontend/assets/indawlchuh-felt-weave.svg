@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <defs>
+    <pattern id="weave" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M0 20 L20 0 L40 20 L20 40 Z" fill="none" stroke="#f4d58c" stroke-width=".8" opacity=".22"/>
+      <path d="M10 20 L20 10 L30 20 L20 30 Z" fill="none" stroke="#b5e1c3" stroke-width=".7" opacity=".16"/>
+      <path d="M20 0 V8 M20 32 V40 M0 20 H8 M32 20 H40" stroke="#f6e4b5" stroke-width=".7" opacity=".17"/>
+      <circle cx="20" cy="20" r="1.6" fill="#f5d78f" opacity=".28"/>
+      <circle cx="0" cy="0" r="1" fill="#d9efdf" opacity=".16"/>
+    </pattern>
+    <linearGradient id="wash" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#dbf4df" stop-opacity=".10"/>
+      <stop offset="1" stop-color="#001f16" stop-opacity=".04"/>
+    </linearGradient>
+  </defs>
+  <rect width="160" height="160" fill="url(#wash)"/>
+  <rect width="160" height="160" fill="url(#weave)"/>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120" fill="none">
+  <!-- Four-way symmetric jewel motif, so it reads correctly in every corner. -->
+  <g stroke="#f4d58c" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M60 8 L112 60 L60 112 L8 60 Z" stroke-width="1.7" opacity=".42"/>
+    <path d="M60 22 L98 60 L60 98 L22 60 Z" stroke-width="1" opacity=".30"/>
+    <path d="M60 38 L82 60 L60 82 L38 60 Z" stroke-width="1.4" opacity=".40"/>
+    <path d="M60 47 L73 60 L60 73 L47 60 Z" stroke-width="1" opacity=".46"/>
+    <path d="M60 8 V29 M60 91 V112 M8 60 H29 M91 60 H112" stroke-width="1" opacity=".25"/>
+    <path d="M24 24 L39 39 M81 81 L96 96 M96 24 L81 39 M39 81 L24 96" stroke-width="1" opacity=".22"/>
+  </g>
+  <circle cx="60" cy="60" r="2.4" fill="#ffe7aa" opacity=".68"/>
+  <circle cx="60" cy="11" r="1.6" fill="#ffe7aa" opacity=".48"/>
+  <circle cx="109" cy="60" r="1.6" fill="#ffe7aa" opacity=".48"/>
+  <circle cx="60" cy="109" r="1.6" fill="#ffe7aa" opacity=".48"/>
+  <circle cx="11" cy="60" r="1.6" fill="#ffe7aa" opacity=".48"/>
+</svg>
