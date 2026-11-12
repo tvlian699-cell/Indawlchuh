@@ -235,6 +235,7 @@ async function processLog(data) {
     return;
   }
 
+  State.busy = true; // <--- ADD THIS LINE
   State.logShown += newEntries.length;
   State.startWatchdog();
 
