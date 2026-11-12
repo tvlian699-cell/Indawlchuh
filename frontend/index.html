@@ -133,24 +133,25 @@ window.openIndawlchuhCoopHub = function () {
 </head>
 <body>
 
-<style>
+ <style>
   #tap-to-start-screen {
     position: fixed; inset: 0; z-index: 10000;
     background: radial-gradient(ellipse at 50% 30%, rgba(22,133,83,.34), transparent 55%), linear-gradient(145deg, #06170f 0%, #0a2b1d 48%, #061810 100%);
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     color: #f3d17f; font-family: Georgia, serif; cursor: pointer;
+    /* Reset button styles since we are changing this to a <button> */
+    border: none; width: 100%; height: 100%; outline: none;
   }
   .tap-logo { font-size: 42px; font-weight: 900; text-shadow: 0 0 22px rgba(231,189,96,.35); margin-bottom: 20px; }
   .tap-hint { font-size: 12px; letter-spacing: 0.2em; color: #b4cbb8; animation: tapPulse 1.5s ease-in-out infinite; text-transform: uppercase; font-family: sans-serif; }
   @keyframes tapPulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
-  /* Hide the rotate overlay while we are waiting for the tap */
   body.tap-active #mobile-rotate-overlay { display: none !important; }
 </style>
 
-<div id="tap-to-start-screen">
+<button id="tap-to-start-screen" type="button">
   <div class="tap-logo">Indawlchuh</div>
   <div class="tap-hint">Tap to Start</div>
-</div>
+</button>
   
 <div id="loading-screen" aria-live="polite" aria-label="Loading Indawlchuh">
   <div class="ls-felt" aria-hidden="true"><svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice"><defs><pattern id="ls-grid" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M50 5 L95 50 L50 95 L5 50 Z" fill="none" stroke="#f3d17f" stroke-opacity=".22" stroke-width="1"/><g fill="#f3d17f" fill-opacity=".45"><circle cx="50" cy="5" r="1.2"/><circle cx="95" cy="50" r="1.2"/><circle cx="50" cy="95" r="1.2"/><circle cx="5" cy="50" r="1.2"/></g></pattern></defs><rect width="100%" height="100%" fill="url(#ls-grid)"/></svg></div>
@@ -354,27 +355,37 @@ window.CFG = { SC: {"♠":"black","♣":"black","♥":"red","♦":"red"}, NM: ["
   el.style.display = 'none';
   document.body.classList.add('tap-active');
 
-  // This runs when the user taps the screen
-  tapScreen.addEventListener('pointerdown', () => {
-    // 1. Force Fullscreen & Landscape
-    if (document.documentElement.requestFullscreen) {
-      document.documentElement.requestFullscreen({ navigationUI: "hide" }).catch(()=>{});
-    }
-    if (screen.orientation && screen.orientation.lock) {
-      screen.orientation.lock('landscape').catch(()=>{});
+    // This runs when the user clicks the button
+  tapScreen.addEventListener('click', async () => {
+    // 1. Force Fullscreen FIRST and wait for it to finish
+    try {
+      if (document.documentElement.requestFullscreen) {
+        await document.documentElement.requestFullscreen({ navigationUI: "hide" });
+      }
+    } catch (err) {
+      console.warn("Fullscreen failed:", err);
     }
 
-    // 2. Force Play Music
+    // 2. Force Landscape SECOND (now that we are in fullscreen)
+    try {
+      if (screen.orientation && screen.orientation.lock) {
+        await screen.orientation.lock('landscape');
+      }
+    } catch (err) {
+      console.warn("Orientation lock failed:", err);
+    }
+
+    // 3. Force Play Music
     if (window.Menu && window.Menu.playMenuMusic) {
       window.Menu.playMenuMusic();
     }
 
-    // 3. Transition to Loading Screen
+    // 4. Transition to Loading Screen
     document.body.classList.remove('tap-active');
     tapScreen.style.display = 'none';
     el.style.display = 'grid';
     
-    // 4. Start the loading bar animation
+    // 5. Start the loading bar animation
     startLoading();
   });
 
