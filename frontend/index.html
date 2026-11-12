@@ -333,7 +333,23 @@ window.CFG = { SC: {"♠":"black","♣":"black","♥":"red","♦":"red"}, NM: ["
   const rampStart = performance.now(); (function rampHalf() { const t = Math.min(1, (performance.now() - rampStart) / 1400); rampTo(90 * (1 - Math.pow(1 - t, 3))); if (t < 1) requestAnimationFrame(rampHalf); })();
   window.addEventListener('load', () => { windowLoaded = true; maybeFinish(); }); setTimeout(() => { windowLoaded = true; maybeFinish(); }, MAX_MS);
   function maybeFinish() { if (finished || !windowLoaded) return; const elapsed = performance.now() - start; const wait = Math.max(0, MIN_MS - elapsed); setTimeout(() => { if (finished) return; rampTo(100); setTimeout(() => { finished = true; el.classList.add('done'); setTimeout(() => { el.style.display = 'none'; }, 600); }, 450); }, wait); }
-  el.addEventListener('pointerdown', () => { if (finished) return; if (performance.now() - start < MIN_MS) return; windowLoaded = true; maybeFinish(); });
+   el.addEventListener('pointerdown', () => {
+    // 1. Force play music on the first tap
+    if (window.Menu && window.Menu.playMenuMusic) window.Menu.playMenuMusic();
+    
+    // 2. Force landscape orientation on the first tap
+    if (window.Menu && window.Menu.isPhoneDevice && window.Menu.isPhoneDevice()) {
+        try {
+            if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(()=>{});
+            if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{});
+        } catch(e){}
+    }
+
+    if (finished) return;
+    if (performance.now() - start < MIN_MS) return;
+    windowLoaded = true;
+    maybeFinish();
+  });
   setTimeout(() => { if (!finished && !windowLoaded) el.classList.add('ready'); }, MIN_MS + 400);
 })();
 </script>
