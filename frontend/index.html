@@ -133,6 +133,25 @@ window.openIndawlchuhCoopHub = function () {
 </head>
 <body>
 
+<style>
+  #tap-to-start-screen {
+    position: fixed; inset: 0; z-index: 10000;
+    background: radial-gradient(ellipse at 50% 30%, rgba(22,133,83,.34), transparent 55%), linear-gradient(145deg, #06170f 0%, #0a2b1d 48%, #061810 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: #f3d17f; font-family: Georgia, serif; cursor: pointer;
+  }
+  .tap-logo { font-size: 42px; font-weight: 900; text-shadow: 0 0 22px rgba(231,189,96,.35); margin-bottom: 20px; }
+  .tap-hint { font-size: 12px; letter-spacing: 0.2em; color: #b4cbb8; animation: tapPulse 1.5s ease-in-out infinite; text-transform: uppercase; font-family: sans-serif; }
+  @keyframes tapPulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+  /* Hide the rotate overlay while we are waiting for the tap */
+  body.tap-active #mobile-rotate-overlay { display: none !important; }
+</style>
+
+<div id="tap-to-start-screen">
+  <div class="tap-logo">Indawlchuh</div>
+  <div class="tap-hint">Tap to Start</div>
+</div>
+  
 <div id="loading-screen" aria-live="polite" aria-label="Loading Indawlchuh">
   <div class="ls-felt" aria-hidden="true"><svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice"><defs><pattern id="ls-grid" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M50 5 L95 50 L50 95 L5 50 Z" fill="none" stroke="#f3d17f" stroke-opacity=".22" stroke-width="1"/><g fill="#f3d17f" fill-opacity=".45"><circle cx="50" cy="5" r="1.2"/><circle cx="95" cy="50" r="1.2"/><circle cx="50" cy="95" r="1.2"/><circle cx="5" cy="50" r="1.2"/></g></pattern></defs><rect width="100%" height="100%" fill="url(#ls-grid)"/></svg></div>
   <div class="ls-lattice" aria-hidden="true"><svg viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice"><defs><pattern id="ls-lat" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse"><g fill="none" stroke="#f3d17f" stroke-opacity=".55" stroke-width="1"><path d="M100 20 L180 100 L100 180 L20 100 Z"/><path d="M100 45 L155 100 L100 155 L45 100 Z"/><path d="M100 70 L130 100 L100 130 L70 100 Z"/><circle cx="100" cy="100" r="3"/><path d="M0 0 L20 20 M200 0 L180 20 M0 200 L20 180 M200 200 L180 180"/></g></pattern></defs><rect width="100%" height="100%" fill="url(#ls-lat)"/></svg></div>
@@ -323,34 +342,97 @@ window.CFG = { SC: {"♠":"black","♣":"black","♥":"red","♦":"red"}, NM: ["
 
 <script id="loading-screen-js">
 (function () {
-  const el = document.getElementById('loading-screen'); const bar = document.getElementById('loading-bar'); const pct = document.getElementById('loading-pct'); const status = document.getElementById('loading-status');
-  if (!el || !bar || !pct || !status) return;
-  const MIN_MS = 1800; const MAX_MS = 6000; const start = performance.now(); let target = 0; let shown = 0; let windowLoaded = false; let finished = false;
-  const STATUS_STEPS = [{ at: 0, text: 'Shuffling the deck…' },{ at: 30, text: 'Dealing cards…' },{ at: 60, text: 'Polishing the tens…' },{ at: 88, text: 'Almost ready…' },{ at: 100, text: 'Ready!' }];
-  function setStatusFor(value) { let msg = STATUS_STEPS[0].text; for (const step of STATUS_STEPS) { if (value >= step.at) msg = step.text; } if (status.textContent !== msg) status.textContent = msg; }
-  function tick() { if (finished) return; const delta = target - shown; if (Math.abs(delta) < 0.5) { shown = target; } else { shown += delta * 0.18; } bar.style.width = shown.toFixed(2) + '%'; pct.textContent = Math.round(shown) + '%'; setStatusFor(shown); if (shown < target - 0.5) { requestAnimationFrame(tick); } else { shown = target; bar.style.width = shown.toFixed(2) + '%'; pct.textContent = Math.round(shown) + '%'; } }
-  function rampTo(p) { target = p; requestAnimationFrame(tick); }
-  const rampStart = performance.now(); (function rampHalf() { const t = Math.min(1, (performance.now() - rampStart) / 1400); rampTo(90 * (1 - Math.pow(1 - t, 3))); if (t < 1) requestAnimationFrame(rampHalf); })();
-  window.addEventListener('load', () => { windowLoaded = true; maybeFinish(); }); setTimeout(() => { windowLoaded = true; maybeFinish(); }, MAX_MS);
-  function maybeFinish() { if (finished || !windowLoaded) return; const elapsed = performance.now() - start; const wait = Math.max(0, MIN_MS - elapsed); setTimeout(() => { if (finished) return; rampTo(100); setTimeout(() => { finished = true; el.classList.add('done'); setTimeout(() => { el.style.display = 'none'; }, 600); }, 450); }, wait); }
-   el.addEventListener('pointerdown', () => {
-    // 1. Force play music on the first tap
-    if (window.Menu && window.Menu.playMenuMusic) window.Menu.playMenuMusic();
-    
-    // 2. Force landscape orientation on the first tap
-    if (window.Menu && window.Menu.isPhoneDevice && window.Menu.isPhoneDevice()) {
-        try {
-            if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(()=>{});
-            if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{});
-        } catch(e){}
+  const tapScreen = document.getElementById('tap-to-start-screen');
+  const el = document.getElementById('loading-screen'); 
+  const bar = document.getElementById('loading-bar'); 
+  const pct = document.getElementById('loading-pct'); 
+  const status = document.getElementById('loading-status');
+  
+  if (!tapScreen || !el || !bar || !pct || !status) return;
+
+  // Hide loading screen initially
+  el.style.display = 'none';
+  document.body.classList.add('tap-active');
+
+  // This runs when the user taps the screen
+  tapScreen.addEventListener('pointerdown', () => {
+    // 1. Force Fullscreen & Landscape
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen({ navigationUI: "hide" }).catch(()=>{});
+    }
+    if (screen.orientation && screen.orientation.lock) {
+      screen.orientation.lock('landscape').catch(()=>{});
     }
 
-    if (finished) return;
-    if (performance.now() - start < MIN_MS) return;
-    windowLoaded = true;
-    maybeFinish();
+    // 2. Force Play Music
+    if (window.Menu && window.Menu.playMenuMusic) {
+      window.Menu.playMenuMusic();
+    }
+
+    // 3. Transition to Loading Screen
+    document.body.classList.remove('tap-active');
+    tapScreen.style.display = 'none';
+    el.style.display = 'grid';
+    
+    // 4. Start the loading bar animation
+    startLoading();
   });
-  setTimeout(() => { if (!finished && !windowLoaded) el.classList.add('ready'); }, MIN_MS + 400);
+
+  function startLoading() {
+    const MIN_MS = 1800; const MAX_MS = 6000; const start = performance.now(); 
+    let target = 0; let shown = 0; let finished = false;
+    let windowLoaded = document.readyState === 'complete';
+
+    if (windowLoaded) {
+      setTimeout(maybeFinish, MIN_MS);
+    } else {
+      window.addEventListener('load', () => { windowLoaded = true; maybeFinish(); }); 
+      setTimeout(() => { windowLoaded = true; maybeFinish(); }, MAX_MS);
+    }
+
+    const STATUS_STEPS = [{ at: 0, text: 'Shuffling the deck…' },{ at: 30, text: 'Dealing cards…' },{ at: 60, text: 'Polishing the tens…' },{ at: 88, text: 'Almost ready…' },{ at: 100, text: 'Ready!' }];
+    
+    function setStatusFor(value) { 
+      let msg = STATUS_STEPS[0].text; 
+      for (const step of STATUS_STEPS) { if (value >= step.at) msg = step.text; } 
+      if (status.textContent !== msg) status.textContent = msg; 
+    }
+    
+    function tick() { 
+      if (finished) return; 
+      const delta = target - shown; 
+      if (Math.abs(delta) < 0.5) { shown = target; } else { shown += delta * 0.18; } 
+      bar.style.width = shown.toFixed(2) + '%'; 
+      pct.textContent = Math.round(shown) + '%'; 
+      setStatusFor(shown); 
+      if (shown < target - 0.5) { requestAnimationFrame(tick); } 
+      else { shown = target; bar.style.width = shown.toFixed(2) + '%'; pct.textContent = Math.round(shown) + '%'; } 
+    }
+    
+    function rampTo(p) { target = p; requestAnimationFrame(tick); }
+    
+    const rampStart = performance.now(); 
+    (function rampHalf() { 
+      const t = Math.min(1, (performance.now() - rampStart) / 1400); 
+      rampTo(90 * (1 - Math.pow(1 - t, 3))); 
+      if (t < 1) requestAnimationFrame(rampHalf); 
+    })();
+
+    function maybeFinish() { 
+      if (finished) return; 
+      const elapsed = performance.now() - start; 
+      const wait = Math.max(0, MIN_MS - elapsed); 
+      setTimeout(() => { 
+        if (finished) return; 
+        rampTo(100); 
+        setTimeout(() => { 
+          finished = true; 
+          el.classList.add('done'); 
+          setTimeout(() => { el.style.display = 'none'; }, 600); 
+        }, 450); 
+      }, wait); 
+    }
+  }
 })();
 </script>
 </body>
