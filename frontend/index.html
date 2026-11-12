@@ -7,54 +7,17 @@
 <link rel="stylesheet" href="/static/styles.css">
 <style id="room-lobby-styles">
 /* Room waiting layout: actual felt table on the left, room controls on the right. */
-#game-shell {
-  display: none;
-  flex: 1;
-  min-height: 0;
-  min-width: 0;
-  gap: 12px;
-  padding: 12px;
-  overflow: auto;
-  align-items: stretch;
-}
-#game-shell #table {
-  flex: 1 1 auto;
-  min-width: 0;
-  min-height: 0;
-  border: 2px solid rgba(201,135,58,.45);
-  border-radius: 16px;
-  overflow: hidden;
-}
-#room-lobby-panel {
-  display: none;
-  flex: 0 0 264px;
-  width: 264px;
-  min-width: 230px;
-  flex-direction: column;
-  gap: 12px;
-  align-self: stretch;
-  padding: 16px;
-  border: 1px solid rgba(201,135,58,.35);
-  border-radius: 14px;
-  color: var(--text, #f0e8d0);
-  background: linear-gradient(160deg, rgba(35,23,12,.98), rgba(17,12,7,.98));
-  box-shadow: 0 8px 28px rgba(0,0,0,.35);
-  overflow-y: auto;
-}
+#game-shell { display: none; flex: 1; min-height: 0; min-width: 0; gap: 12px; padding: 12px; overflow: auto; align-items: stretch; }
+#game-shell #table { flex: 1 1 auto; min-width: 0; min-height: 0; border: 2px solid rgba(201,135,58,.45); border-radius: 16px; overflow: hidden; }
+#room-lobby-panel { display: none; flex: 0 0 264px; width: 264px; min-width: 230px; flex-direction: column; gap: 12px; align-self: stretch; padding: 16px; border: 1px solid rgba(201,135,58,.35); border-radius: 14px; color: var(--text, #f0e8d0); background: linear-gradient(160deg, rgba(35,23,12,.98), rgba(17,12,7,.98)); box-shadow: 0 8px 28px rgba(0,0,0,.35); overflow-y: auto; }
 .rl-head { display:flex; align-items:center; justify-content:space-between; gap:8px; }
 .rl-title { color:var(--gold2,#e0a855); font-size:11px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; }
-.rl-leave {
-  border:1px solid rgba(255,255,255,.12); border-radius:7px; padding:5px 8px;
-  color:var(--text-muted,#7a6a50); background:rgba(255,255,255,.04); font-size:10px;
-}
+.rl-leave { border:1px solid rgba(255,255,255,.12); border-radius:7px; padding:5px 8px; color:var(--text-muted,#7a6a50); background:rgba(255,255,255,.04); font-size:10px; }
 .rl-code-card { padding:13px; border:1px solid rgba(201,135,58,.28); border-radius:11px; background:rgba(201,135,58,.07); text-align:center; }
 .rl-code-label { color:var(--text-muted,#7a6a50); font-size:9px; font-weight:800; letter-spacing:.13em; }
 .rl-code { margin:5px 0 11px; color:var(--gold2,#e0a855); font-size:30px; font-weight:950; letter-spacing:.2em; line-height:1.15; }
 .rl-copy-row { display:flex; gap:7px; }
-.rl-copy-btn, .rl-start-btn {
-  border:1px solid rgba(201,135,58,.4); border-radius:8px; padding:9px 8px;
-  color:var(--gold2,#e0a855); background:rgba(201,135,58,.12); font-size:11px; font-weight:800;
-}
+.rl-copy-btn, .rl-start-btn { border:1px solid rgba(201,135,58,.4); border-radius:8px; padding:9px 8px; color:var(--gold2,#e0a855); background:rgba(201,135,58,.12); font-size:11px; font-weight:800; }
 .rl-copy-btn { flex:1; }
 .rl-copy-btn:hover, .rl-start-btn:hover:not(:disabled) { background:rgba(201,135,58,.24); }
 .rl-section-label { color:var(--text-muted,#7a6a50); font-size:9px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; }
@@ -62,44 +25,20 @@
 .rl-start-btn { display:none; width:100%; padding:12px; font-size:13px; }
 .rl-start-btn:disabled { opacity:.45; cursor:not-allowed; }
 .room-seat-slot { display:none; }
-#table.room-waiting {
-  grid-template-columns: minmax(112px,.72fr) minmax(130px,1fr) minmax(112px,.72fr);
-  grid-template-rows: 12px minmax(120px,1fr) minmax(74px,.55fr) auto 12px;
-  background:
-    radial-gradient(ellipse 90% 70% at 50% 50%, #1b4b2b 0%, #143a20 66%, #0f2e18 100%);
-}
-#table.room-waiting .capture-strip,
-#table.room-waiting #trick-area,
-#table.room-waiting #deal-layer,
-#table.room-waiting #play-layer { display:none !important; }
+#table.room-waiting { grid-template-columns: minmax(112px,.72fr) minmax(130px,1fr) minmax(112px,.72fr); grid-template-rows: 12px minmax(120px,1fr) minmax(74px,.55fr) auto 12px; background: radial-gradient(ellipse 90% 70% at 50% 50%, #1b4b2b 0%, #143a20 66%, #0f2e18 100%); }
+#table.room-waiting .capture-strip, #table.room-waiting #trick-area, #table.room-waiting #deal-layer, #table.room-waiting #play-layer { display:none !important; }
 #table.room-waiting #zone-top { grid-column:2; grid-row:2; justify-content:center; }
 #table.room-waiting #zone-left { grid-column:1; grid-row:2 / 4; justify-content:center; }
 #table.room-waiting #zone-right { grid-column:3; grid-row:2 / 4; justify-content:center; }
-#table.room-waiting #zone-bottom {
-  grid-column:1 / -1; grid-row:4; min-height:66px; padding:8px;
-  justify-content:center; background:rgba(0,0,0,.10); border-top:1px solid rgba(255,255,255,.06);
-}
-#table.room-waiting #hand-top,
-#table.room-waiting #hand-left,
-#table.room-waiting #hand-right,
-#table.room-waiting #hand-scroll,
-#table.room-waiting #status-inline,
-#table.room-waiting #give-up-btn { display:none !important; }
+#table.room-waiting #zone-bottom { grid-column:1 / -1; grid-row:4; min-height:66px; padding:8px; justify-content:center; background:rgba(0,0,0,.10); border-top:1px solid rgba(255,255,255,.06); }
+#table.room-waiting #hand-top, #table.room-waiting #hand-left, #table.room-waiting #hand-right, #table.room-waiting #hand-scroll, #table.room-waiting #status-inline, #table.room-waiting #give-up-btn { display:none !important; }
 #table.room-waiting .pc-cnt { display:none; }
-#table.room-waiting #zone-top > .pchip,
-#table.room-waiting #zone-left > .pchip,
-#table.room-waiting #zone-right > .pchip { display:none; }
+#table.room-waiting #zone-top > .pchip, #table.room-waiting #zone-left > .pchip, #table.room-waiting #zone-right > .pchip { display:none; }
 #table.room-waiting .pzone { padding:5px; gap:8px; }
 #table.room-waiting #zone-bottom .bottom-row-top { justify-content:center; }
 #table.room-waiting #zone-bottom .pchip { padding:7px 13px; border-color:rgba(201,135,58,.55); }
 #table.room-waiting .room-seat-slot { display:flex; width:100%; justify-content:center; }
-.room-seat-card {
-  width:min(100%,156px); min-height:124px; padding:9px 8px;
-  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px;
-  border:1px dashed rgba(240,232,208,.28); border-radius:12px;
-  background:linear-gradient(160deg,rgba(0,0,0,.25),rgba(255,255,255,.035));
-  text-align:center; box-shadow:0 5px 14px rgba(0,0,0,.13);
-}
+.room-seat-card { width:min(100%,156px); min-height:124px; padding:9px 8px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; border:1px dashed rgba(240,232,208,.28); border-radius:12px; background:linear-gradient(160deg,rgba(0,0,0,.25),rgba(255,255,255,.035)); text-align:center; box-shadow:0 5px 14px rgba(0,0,0,.13); }
 .room-seat-card.is-bot { border-style:solid; border-color:rgba(201,135,58,.38); background:rgba(201,135,58,.07); }
 .room-seat-card.is-human { border-style:solid; border-color:rgba(91,164,212,.42); background:rgba(91,164,212,.07); }
 .rs-icon { width:29px; height:29px; display:grid; place-items:center; border-radius:50%; color:var(--gold2,#e0a855); background:rgba(201,135,58,.12); font-size:22px; font-weight:800; }
@@ -107,25 +46,10 @@
 .rs-name { max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:11px; font-weight:850; color:var(--text,#f0e8d0); }
 .rs-status { color:var(--text-muted,#7a6a50); font-size:9px; }
 .rs-controls { display:flex; flex-direction:column; align-items:center; gap:5px; width:100%; margin-top:2px; }
-.rs-toggle {
-  border:1px solid rgba(201,135,58,.32); border-radius:6px; padding:4px 7px;
-  color:var(--gold2,#e0a855); background:rgba(201,135,58,.10); font-size:9px; font-weight:800;
-}
-.rs-difficulty {
-  max-width:100%; border:1px solid rgba(201,135,58,.28); border-radius:6px;
-  padding:4px 5px; color:var(--text,#f0e8d0); background:#24190f; font-size:9px;
-}
+.rs-toggle { border:1px solid rgba(201,135,58,.32); border-radius:6px; padding:4px 7px; color:var(--gold2,#e0a855); background:rgba(201,135,58,.10); font-size:9px; font-weight:800; }
+.rs-difficulty { max-width:100%; border:1px solid rgba(201,135,58,.28); border-radius:6px; padding:4px 5px; color:var(--text,#f0e8d0); background:#24190f; font-size:9px; }
 .rs-difficulty:disabled { opacity:.8; }
-@media (max-width: 760px) {
-  #game-shell { flex-direction:column; gap:8px; padding:8px; }
-  #game-shell #table { flex:0 0 min(55vh,500px); min-height:330px; width:100%; }
-  #room-lobby-panel { flex:0 0 auto; width:100%; min-width:0; max-height:38vh; padding:12px; }
-  #table.room-waiting { grid-template-columns:minmax(82px,.7fr) minmax(90px,1fr) minmax(82px,.7fr); }
-  .room-seat-card { min-height:112px; padding:7px 4px; }
-  .rs-toggle { padding:4px 5px; }
-}
-
-/* Room seat selection: the server is authoritative; disabled seats are informational. */
+@media (max-width: 760px) { #game-shell { flex-direction:column; gap:8px; padding:8px; } #game-shell #table { flex:0 0 min(55vh,500px); min-height:330px; width:100%; } #room-lobby-panel { flex:0 0 auto; width:100%; min-width:0; max-height:38vh; padding:12px; } #table.room-waiting { grid-template-columns:minmax(82px,.7fr) minmax(90px,1fr) minmax(82px,.7fr); } .room-seat-card { min-height:112px; padding:7px 4px; } .rs-toggle { padding:4px 5px; } }
 .room-seat-picker { display:grid; grid-template-columns:1fr; gap:9px; width:100%; margin-top:8px; }
 .seat-pick-btn { width:100%; display:flex; align-items:center; gap:12px; text-align:left; padding:12px; border:1px solid rgba(201,135,58,.35); border-radius:11px; color:var(--text,#f0e8d0); background:rgba(201,135,58,.08); }
 .seat-pick-btn:not(:disabled):active { transform:scale(.985); background:rgba(201,135,58,.18); }
@@ -140,17 +64,8 @@
 .seat-picker-loading,.seat-picker-empty { padding:15px 10px; text-align:center; color:var(--text-muted,#7a6a50); font-size:12px; }
 .seat-picker-footnote { margin-top:12px; color:var(--text-muted,#7a6a50); font-size:10px; line-height:1.45; text-align:center; }
 #room-change-seat-btn { flex:0 0 auto; padding:5px 8px; border:1px solid rgba(201,135,58,.4); border-radius:8px; color:var(--gold2,#e0a855); background:rgba(201,135,58,.1); font-size:10px; font-weight:800; white-space:nowrap; }
-@media (max-width:480px) {
-  .room-seat-picker { gap:7px; }
-  .seat-pick-btn { padding:10px; }
-  #room-change-seat-btn { font-size:9px; padding:5px 6px; }
-}
-
-/* Spectator roster and clickable open seats. */
-.rs-join-seat {
-  border:1px solid rgba(91,164,212,.48); border-radius:7px; padding:5px 8px;
-  color:#b9def5; background:rgba(91,164,212,.12); font-size:9px; font-weight:850;
-}
+@media (max-width:480px) { .room-seat-picker { gap:7px; } .seat-pick-btn { padding:10px; } #room-change-seat-btn { font-size:9px; padding:5px 6px; } }
+.rs-join-seat { border:1px solid rgba(91,164,212,.48); border-radius:7px; padding:5px 8px; color:#b9def5; background:rgba(91,164,212,.12); font-size:9px; font-weight:850; }
 .rs-join-seat:active { transform:scale(.97); background:rgba(91,164,212,.22); }
 .rl-spectator-head { display:flex; align-items:center; justify-content:space-between; gap:8px; }
 .rl-spectator-count { min-width:20px; padding:2px 7px; border-radius:20px; color:#f1d7a4; background:rgba(201,135,58,.15); font-size:10px; font-weight:900; text-align:center; }
@@ -159,8 +74,6 @@
 .rl-spectator-dot { width:7px; height:7px; border-radius:50%; background:#d7a34e; box-shadow:0 0 8px rgba(215,163,78,.45); }
 .rl-no-spectators { padding:7px 2px; color:var(--text-muted,#7a6a50); font-size:10px; }
 .rl-start-rule { font-size:10px; opacity:.85; }
-
-/* Phone orientation fallback. It is only activated while a game/room is open. */
 #mobile-rotate-overlay { display:none; position:fixed; inset:0; z-index:20000; align-items:center; justify-content:center; padding:28px; background:radial-gradient(ellipse at center,#1d422c 0%,#0b1d13 72%); color:#f0e8d0; text-align:center; }
 #mobile-rotate-overlay.visible { display:flex; }
 .mro-card { width:min(360px,100%); display:flex; flex-direction:column; align-items:center; gap:14px; }
@@ -168,542 +81,144 @@
 .mro-title { color:#e0a855; font-size:22px; font-weight:950; letter-spacing:.04em; }
 .mro-subtitle { max-width:300px; color:rgba(240,232,208,.78); font-size:13px; line-height:1.6; }
 @keyframes mro-rotate { 0%,15% { transform:rotate(0deg); } 55%,85% { transform:rotate(90deg); } 100% { transform:rotate(90deg); } }
-
 </style>
 <style id="loading-screen-styles">
-/* ═══════════════════════════════════════════════════════════════════════════
-   INDAWLCHUH — LOADING SCREEN
-   Overlays #menu-overlay until the app is ready, then fades out.
-   All selectors are prefixed .ls- / #loading-screen so they cannot
-   collide with existing game/menu styles.
-   ═══════════════════════════════════════════════════════════════════════════ */
-#loading-screen {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  background:
-    radial-gradient(ellipse at 50% 30%, rgba(22,133,83,.34), transparent 55%),
-    radial-gradient(ellipse at 100% 100%, rgba(201,155,61,.10), transparent 42%),
-    linear-gradient(145deg, #06170f 0%, #0a2b1d 48%, #061810 100%);
-  opacity: 1;
-  transition: opacity .55s cubic-bezier(.4,0,.2,1);
-}
+#loading-screen { position: fixed; inset: 0; z-index: 9999; display: grid; place-items: center; overflow: hidden; background: radial-gradient(ellipse at 50% 30%, rgba(22,133,83,.34), transparent 55%), radial-gradient(ellipse at 100% 100%, rgba(201,155,61,.10), transparent 42%), linear-gradient(145deg, #06170f 0%, #0a2b1d 48%, #061810 100%); opacity: 1; transition: opacity .55s cubic-bezier(.4,0,.2,1); }
 #loading-screen.done { opacity: 0; pointer-events: none; }
-
-/* Texture layers. Replace the inline <svg> children with
-   <img src="/static/loading-felt.png"> / <img src="/static/loading-lattice.png">
-   once the real assets are in place. */
-.ls-felt,
-.ls-lattice {
-  position: absolute; inset: 0; pointer-events: none;
-  mix-blend-mode: screen;
-}
-.ls-felt    { opacity: .38; }
+.ls-felt, .ls-lattice { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; }
+.ls-felt { opacity: .38; }
 .ls-lattice { opacity: .28; animation: ls-lattice-drift 24s ease-in-out infinite alternate; }
-.ls-felt svg, .ls-lattice svg, .ls-felt img, .ls-lattice img {
-  width: 100%; height: 100%; display: block; object-fit: cover;
-}
-@keyframes ls-lattice-drift {
-  from { transform: scale(1)    rotate(0deg); }
-  to   { transform: scale(1.04) rotate(1.5deg); }
-}
-
-.ls-content {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  padding: 24px;
-  animation: ls-fade-up .7s cubic-bezier(.2,.75,.25,1) .15s both;
-}
-@keyframes ls-fade-up {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* Medallion + orbiting suits */
-.medallion-wrap {
-  position: relative;
-  width: 180px; height: 180px;
-  display: grid; place-items: center;
-  margin-bottom: 8px;
-}
-.medallion-svg {
-  width: 100%; height: 100%;
-  animation: medallion-spin 40s linear infinite;
-  filter: drop-shadow(0 0 18px rgba(231,189,96,.28));
-}
+.ls-felt svg, .ls-lattice svg, .ls-felt img, .ls-lattice img { width: 100%; height: 100%; display: block; object-fit: cover; }
+@keyframes ls-lattice-drift { from { transform: scale(1) rotate(0deg); } to { transform: scale(1.04) rotate(1.5deg); } }
+.ls-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 24px; animation: ls-fade-up .7s cubic-bezier(.2,.75,.25,1) .15s both; }
+@keyframes ls-fade-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+.medallion-wrap { position: relative; width: 180px; height: 180px; display: grid; place-items: center; margin-bottom: 8px; }
+.medallion-svg { width: 100%; height: 100%; animation: medallion-spin 40s linear infinite; filter: drop-shadow(0 0 18px rgba(231,189,96,.28)); }
 @keyframes medallion-spin { to { transform: rotate(360deg); } }
-
-.msuit {
-  position: absolute;
-  font-size: 16px;
-  color: #f3d17f;
-  text-shadow: 0 0 10px rgba(231,189,96,.7);
-  pointer-events: none;
-}
-.msuit-n { top: -4px;    left: 50%;  animation: suit-h 2.4s ease-in-out infinite 0s;   }
-.msuit-e { right: -4px;  top: 50%;   animation: suit-v 2.4s ease-in-out infinite .6s;  }
-.msuit-s { bottom: -4px; left: 50%;  animation: suit-h 2.4s ease-in-out infinite 1.2s; }
-.msuit-w { left: -4px;   top: 50%;   animation: suit-v 2.4s ease-in-out infinite 1.8s; }
-@keyframes suit-h {
-  0%, 100% { opacity: .35; transform: translateX(-50%) scale(.95); }
-  50%      { opacity: 1;   transform: translateX(-50%) scale(1.15); }
-}
-@keyframes suit-v {
-  0%, 100% { opacity: .35; transform: translateY(-50%) scale(.95); }
-  50%      { opacity: 1;   transform: translateY(-50%) scale(1.15); }
-}
-
-.ls-logo {
-  font-family: Georgia, serif;
-  font-size: 34px;
-  font-weight: 900;
-  color: #f3d17f;
-  letter-spacing: .05em;
-  text-shadow: 0 0 22px rgba(231,189,96,.35), 0 3px 0 rgba(0,0,0,.18);
-  animation: brandBreathe 4.8s ease-in-out infinite;
-}
-@keyframes brandBreathe {
-  0%, 100% { text-shadow: 0 0 16px rgba(231,189,96,.20), 0 3px 0 rgba(0,0,0,.18); }
-  50%      { text-shadow: 0 0 30px rgba(231,189,96,.48), 0 3px 0 rgba(0,0,0,.18); }
-}
-.ls-subtitle {
-  font-size: 10px;
-  letter-spacing: .34em;
-  color: #b4cbb8;
-  text-transform: uppercase;
-  margin-top: -4px;
-}
-.ls-suits-row {
-  font-size: 16px;
-  letter-spacing: .28em;
-  color: #f0cd79;
-  text-shadow: 0 0 12px rgba(231,189,96,.28);
-  opacity: .8;
-  margin: 4px 0 14px;
-}
-
-/* Progress bar */
-.ls-progress-wrap {
-  width: 260px;
-  max-width: 80vw;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.ls-progress-track {
-  height: 6px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.07);
-  border: 1px solid rgba(231,189,96,.18);
-  overflow: hidden;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,.4);
-}
-.ls-progress-bar {
-  height: 100%;
-  width: 0%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #c99b3d, #f3d17f, #c99b3d);
-  background-size: 200% 100%;
-  animation: ls-bar-shimmer 1.6s linear infinite;
-  transition: width .28s cubic-bezier(.4,0,.2,1);
-  box-shadow: 0 0 12px rgba(231,189,96,.5);
-}
-@keyframes ls-bar-shimmer {
-  from { background-position: 0 0; }
-  to   { background-position: 200% 0; }
-}
-.ls-progress-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  font-size: 11px;
-  color: #a8b9a9;
-}
+.msuit { position: absolute; font-size: 16px; color: #f3d17f; text-shadow: 0 0 10px rgba(231,189,96,.7); pointer-events: none; }
+.msuit-n { top: -4px; left: 50%; animation: suit-h 2.4s ease-in-out infinite 0s; }
+.msuit-e { right: -4px; top: 50%; animation: suit-v 2.4s ease-in-out infinite .6s; }
+.msuit-s { bottom: -4px; left: 50%; animation: suit-h 2.4s ease-in-out infinite 1.2s; }
+.msuit-w { left: -4px; top: 50%; animation: suit-v 2.4s ease-in-out infinite 1.8s; }
+@keyframes suit-h { 0%, 100% { opacity: .35; transform: translateX(-50%) scale(.95); } 50% { opacity: 1; transform: translateX(-50%) scale(1.15); } }
+@keyframes suit-v { 0%, 100% { opacity: .35; transform: translateY(-50%) scale(.95); } 50% { opacity: 1; transform: translateY(-50%) scale(1.15); } }
+.ls-logo { font-family: Georgia, serif; font-size: 34px; font-weight: 900; color: #f3d17f; letter-spacing: .05em; text-shadow: 0 0 22px rgba(231,189,96,.35), 0 3px 0 rgba(0,0,0,.18); animation: brandBreathe 4.8s ease-in-out infinite; }
+@keyframes brandBreathe { 0%, 100% { text-shadow: 0 0 16px rgba(231,189,96,.20), 0 3px 0 rgba(0,0,0,.18); } 50% { text-shadow: 0 0 30px rgba(231,189,96,.48), 0 3px 0 rgba(0,0,0,.18); } }
+.ls-subtitle { font-size: 10px; letter-spacing: .34em; color: #b4cbb8; text-transform: uppercase; margin-top: -4px; }
+.ls-suits-row { font-size: 16px; letter-spacing: .28em; color: #f0cd79; text-shadow: 0 0 12px rgba(231,189,96,.28); opacity: .8; margin: 4px 0 14px; }
+.ls-progress-wrap { width: 260px; max-width: 80vw; display: flex; flex-direction: column; gap: 6px; }
+.ls-progress-track { height: 6px; border-radius: 999px; background: rgba(255,255,255,.07); border: 1px solid rgba(231,189,96,.18); overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,.4); }
+.ls-progress-bar { height: 100%; width: 0%; border-radius: inherit; background: linear-gradient(90deg, #c99b3d, #f3d17f, #c99b3d); background-size: 200% 100%; animation: ls-bar-shimmer 1.6s linear infinite; transition: width .28s cubic-bezier(.4,0,.2,1); box-shadow: 0 0 12px rgba(231,189,96,.5); }
+@keyframes ls-bar-shimmer { from { background-position: 0 0; } to { background-position: 200% 0; } }
+.ls-progress-meta { display: flex; justify-content: space-between; align-items: baseline; font-size: 11px; color: #a8b9a9; }
 .ls-status { font-style: italic; opacity: .85; }
-.ls-pct    { font-weight: 800; color: #f3d17f; letter-spacing: .04em; min-width: 36px; text-align: right; }
-
-/* Optional "Tap to continue" hint if load beats minimum time */
-.ls-tap-hint {
-  position: absolute;
-  bottom: 32px;
-  left: 50%;
-  transform: translateX(-50%) translateY(6px);
-  font-size: 11px;
-  letter-spacing: .2em;
-  text-transform: uppercase;
-  color: rgba(231,189,96,.6);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .3s, transform .3s;
-}
-#loading-screen.ready .ls-tap-hint {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-  animation: ls-tap-breathe 2s ease-in-out infinite;
-}
-@keyframes ls-tap-breathe {
-  0%, 100% { opacity: .55; }
-  50%      { opacity: 1; }
-}
-
-@media (max-width: 480px) {
-  .medallion-wrap { width: 140px; height: 140px; }
-  .ls-logo        { font-size: 28px; }
-  .ls-suits-row   { font-size: 14px; }
-  .ls-progress-wrap { width: 220px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .medallion-svg,
-  .ls-lattice,
-  .ls-progress-bar,
-  .ls-logo,
-  .msuit { animation: none !important; }
-}
+.ls-pct { font-weight: 800; color: #f3d17f; letter-spacing: .04em; min-width: 36px; text-align: right; }
+.ls-tap-hint { position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(6px); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: rgba(231,189,96,.6); opacity: 0; pointer-events: none; transition: opacity .3s, transform .3s; }
+#loading-screen.ready .ls-tap-hint { opacity: 1; transform: translateX(-50%) translateY(0); animation: ls-tap-breathe 2s ease-in-out infinite; }
+@keyframes ls-tap-breathe { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+@media (max-width: 480px) { .medallion-wrap { width: 140px; height: 140px; } .ls-logo { font-size: 28px; } .ls-suits-row { font-size: 14px; } .ls-progress-wrap { width: 220px; } }
+@media (prefers-reduced-motion: reduce) { .medallion-svg, .ls-lattice, .ls-progress-bar, .ls-logo, .msuit { animation: none !important; } }
 </style>
 <script>
-// Independent fallback navigation for the main Co-op button. This does not
-// depend on Menu being initialized, so the hub still opens if menu.js has a
-// stale cached copy or its global object is unavailable.
 window.openIndawlchuhCoopHub = function () {
   const overlay = document.getElementById('menu-overlay');
   const target = document.getElementById('screen-coop');
-  if (!target) {
-    console.error('[Indawlchuh] Co-op screen #screen-coop is missing from index.html');
-    return false;
-  }
+  if (!target) { console.error('[Indawlchuh] Co-op screen #screen-coop is missing'); return false; }
   if (overlay) overlay.classList.remove('hidden');
-  document.querySelectorAll('#menu-overlay .menu-panel').forEach(panel => {
-    panel.style.display = 'none';
-  });
+  document.querySelectorAll('#menu-overlay .menu-panel').forEach(panel => { panel.style.display = 'none'; });
   target.style.display = 'flex';
-  console.info('[Indawlchuh] Co-op hub opened');
   return false;
 };
 </script>
-
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════════════════════════
-     LOADING SCREEN
-     Sits above #menu-overlay (z-index 9999 vs 700) until the app
-     is ready, then fades out. The menu is fully rendered underneath.
-     ══════════════════════════════════════════════════════════════ -->
 <div id="loading-screen" aria-live="polite" aria-label="Loading Indawlchuh">
-
-  <!-- TEXTURE: diamond grid (felt)
-       ASSET SWAP: replace the inline <svg> with
-         <img src="/static/loading-felt.png" alt="">
-       when the PNG is in /static/. -->
-  <div class="ls-felt" aria-hidden="true">
-    <svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice">
-      <defs>
-        <pattern id="ls-grid" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
-          <path d="M50 5 L95 50 L50 95 L5 50 Z" fill="none" stroke="#f3d17f" stroke-opacity=".22" stroke-width="1"/>
-          <g fill="#f3d17f" fill-opacity=".45">
-            <circle cx="50" cy="5"  r="1.2"/>
-            <circle cx="95" cy="50" r="1.2"/>
-            <circle cx="50" cy="95" r="1.2"/>
-            <circle cx="5"  cy="50" r="1.2"/>
-          </g>
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#ls-grid)"/>
-    </svg>
-  </div>
-
-  <!-- TEXTURE: diamond lattice frame
-       ASSET SWAP: replace the inline <svg> with
-         <img src="/static/loading-lattice.png" alt="">
-       when the PNG is in /static/. -->
-  <div class="ls-lattice" aria-hidden="true">
-    <svg viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice">
-      <defs>
-        <pattern id="ls-lat" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse">
-          <g fill="none" stroke="#f3d17f" stroke-opacity=".55" stroke-width="1">
-            <path d="M100 20 L180 100 L100 180 L20 100 Z"/>
-            <path d="M100 45 L155 100 L100 155 L45 100 Z"/>
-            <path d="M100 70 L130 100 L100 130 L70 100 Z"/>
-            <circle cx="100" cy="100" r="3"/>
-            <path d="M0 0 L20 20 M200 0 L180 20 M0 200 L20 180 M200 200 L180 180"/>
-          </g>
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#ls-lat)"/>
-    </svg>
-  </div>
-
+  <div class="ls-felt" aria-hidden="true"><svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice"><defs><pattern id="ls-grid" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M50 5 L95 50 L50 95 L5 50 Z" fill="none" stroke="#f3d17f" stroke-opacity=".22" stroke-width="1"/><g fill="#f3d17f" fill-opacity=".45"><circle cx="50" cy="5" r="1.2"/><circle cx="95" cy="50" r="1.2"/><circle cx="50" cy="95" r="1.2"/><circle cx="5" cy="50" r="1.2"/></g></pattern></defs><rect width="100%" height="100%" fill="url(#ls-grid)"/></svg></div>
+  <div class="ls-lattice" aria-hidden="true"><svg viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice"><defs><pattern id="ls-lat" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse"><g fill="none" stroke="#f3d17f" stroke-opacity=".55" stroke-width="1"><path d="M100 20 L180 100 L100 180 L20 100 Z"/><path d="M100 45 L155 100 L100 155 L45 100 Z"/><path d="M100 70 L130 100 L100 130 L70 100 Z"/><circle cx="100" cy="100" r="3"/><path d="M0 0 L20 20 M200 0 L180 20 M0 200 L20 180 M200 200 L180 180"/></g></pattern></defs><rect width="100%" height="100%" fill="url(#ls-lat)"/></svg></div>
   <div class="ls-content">
-    <!-- MEDALLION: ellipse + 8-point star + 2 side stars
-         ASSET SWAP: replace the inline <svg class="medallion-svg"> with
-           <img src="/static/loading-medallion.png" class="medallion-svg" alt="">
-         when the PNG is in /static/. -->
-    <div class="medallion-wrap">
-      <span class="msuit msuit-n" aria-hidden="true">♠</span>
-      <span class="msuit msuit-e" aria-hidden="true">♥</span>
-      <span class="msuit msuit-s" aria-hidden="true">♦</span>
-      <span class="msuit msuit-w" aria-hidden="true">♣</span>
-      <svg class="medallion-svg" viewBox="0 0 400 260" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-        <g fill="none" stroke="#f3d17f" stroke-opacity=".72" stroke-width="1.4" stroke-linejoin="round">
-          <ellipse cx="200" cy="130" rx="190" ry="120"/>
-          <ellipse cx="200" cy="130" rx="120" ry="72"/>
-          <path d="M200 30 L215 110 L290 95 L225 130 L290 165 L215 150
-                   L200 230 L185 150 L110 165 L175 130 L110 95 L185 110 Z"/>
-          <path d="M70 130 L80 118 L92 130 L80 142 Z"/>
-          <path d="M330 130 L320 118 L308 130 L320 142 Z"/>
-          <rect x="22"  y="128" width="6" height="4"/>
-          <rect x="372" y="128" width="6" height="4"/>
-          <rect x="197" y="248" width="6" height="4"/>
-          <circle cx="200" cy="130" r="2.2" fill="#f3d17f" fill-opacity=".9" stroke="none"/>
-        </g>
-      </svg>
-    </div>
-
+    <div class="medallion-wrap"><span class="msuit msuit-n" aria-hidden="true">♠</span><span class="msuit msuit-e" aria-hidden="true">♥</span><span class="msuit msuit-s" aria-hidden="true">♦</span><span class="msuit msuit-w" aria-hidden="true">♣</span><svg class="medallion-svg" viewBox="0 0 400 260" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><g fill="none" stroke="#f3d17f" stroke-opacity=".72" stroke-width="1.4" stroke-linejoin="round"><ellipse cx="200" cy="130" rx="190" ry="120"/><ellipse cx="200" cy="130" rx="120" ry="72"/><path d="M200 30 L215 110 L290 95 L225 130 L290 165 L215 150 L200 230 L185 150 L110 165 L175 130 L110 95 L185 110 Z"/><path d="M70 130 L80 118 L92 130 L80 142 Z"/><path d="M330 130 L320 118 L308 130 L320 142 Z"/><rect x="22" y="128" width="6" height="4"/><rect x="372" y="128" width="6" height="4"/><rect x="197" y="248" width="6" height="4"/><circle cx="200" cy="130" r="2.2" fill="#f3d17f" fill-opacity=".9" stroke="none"/></g></svg></div>
     <div class="ls-logo">Indawlchuh</div>
     <div class="ls-subtitle">CARD GAME</div>
     <div class="ls-suits-row"><span>♥</span><span>♠</span><span>♦</span><span>♣</span></div>
-
-    <div class="ls-progress-wrap">
-      <div class="ls-progress-track">
-        <div class="ls-progress-bar" id="loading-bar"></div>
-      </div>
-      <div class="ls-progress-meta">
-        <span class="ls-status" id="loading-status">Shuffling the deck…</span>
-        <span class="ls-pct"    id="loading-pct">0%</span>
-      </div>
-    </div>
+    <div class="ls-progress-wrap"><div class="ls-progress-track"><div class="ls-progress-bar" id="loading-bar"></div></div><div class="ls-progress-meta"><span class="ls-status" id="loading-status">Shuffling the deck…</span><span class="ls-pct" id="loading-pct">0%</span></div></div>
   </div>
-
   <div class="ls-tap-hint" id="loading-tap-hint">Tap to continue</div>
 </div>
 
-<!-- ══════════════════════════════════════════════
-     MENU OVERLAY
-══════════════════════════════════════════════ -->
 <div id="menu-overlay">
-  <div class="menu-corner tl">A♠</div>
-  <div class="menu-corner tr">K♥</div>
-  <div class="menu-corner bl">Q♦</div>
-  <div class="menu-corner br">J♣</div>
-  <div class="menu-oval"></div>
+  <div class="menu-corner tl">A♠</div><div class="menu-corner tr">K♥</div><div class="menu-corner bl">Q♦</div><div class="menu-corner br">J♣</div><div class="menu-oval"></div>
 
-  <!-- ── Main screen ── -->
   <div class="menu-panel" id="screen-main">
-    <div class="menu-logo">Indawlchuh</div>
-    <div class="menu-subtitle">CARD GAME</div>
-    <div class="menu-suits"><span>♥</span><span>♠</span><span>♦</span><span>♣</span></div>
-    <div class="menu-divider"></div>
-    <button class="menu-btn" onclick="Menu.showScreen('diff')">
-      <svg class="mb-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M7 10h2M15 10h2"/></svg>
-      Vs AI
-    </button>
-    <button class="menu-btn" id="coop-mode-btn" type="button" onclick="return window.openIndawlchuhCoopHub()">
-      <svg class="mb-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="3"/><circle cx="15" cy="7" r="3"/><path d="M3 21v-1a6 6 0 0 1 6-6h6a6 6 0 0 1 6 6v1"/></svg>
-      Coop Mode
-    </button>
-    <button class="menu-btn" onclick="Menu.showScreen('options')">
-      <svg class="mb-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/><circle cx="12" cy="12" r="8" stroke-dasharray="2 4"/></svg>
-      Options
-    </button>
-    <button class="menu-btn" onclick="Menu.confirmExit()">
-      <svg class="mb-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      Exit
-    </button>
+    <div class="menu-logo">Indawlchuh</div><div class="menu-subtitle">CARD GAME</div><div class="menu-suits"><span>♥</span><span>♠</span><span>♦</span><span>♣</span></div><div class="menu-divider"></div>
+    <button class="menu-btn" onclick="Menu.showScreen('diff')"><svg class="mb-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M7 10h2M15 10h2"/></svg>Vs AI</button>
+    <button class="menu-btn" id="coop-mode-btn" type="button" onclick="return window.openIndawlchuhCoopHub()"><svg class="mb-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="3"/><circle cx="15" cy="7" r="3"/><path d="M3 21v-1a6 6 0 0 1 6-6h6a6 6 0 0 1 6 6v1"/></svg>Coop Mode</button>
+    <button class="menu-btn" onclick="Menu.showScreen('options')"><svg class="mb-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/><circle cx="12" cy="12" r="8" stroke-dasharray="2 4"/></svg>Options</button>
+    <button class="menu-btn" onclick="Menu.confirmExit()"><svg class="mb-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Exit</button>
     <div class="menu-footer">v0.2 · Indawlchuh · Mizo Card Game</div>
   </div>
 
-  <!-- ── Vs AI difficulty ── -->
   <div class="menu-panel" id="screen-diff" style="display:none">
-    <div class="panel-header">
-      <button class="diff-back-btn" onclick="Menu.showScreen('main')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
-      <span class="diff-screen-title">Vs AI</span>
-    </div>
+    <div class="panel-header"><button class="diff-back-btn" onclick="Menu.showScreen('main')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button><span class="diff-screen-title">Vs AI</span></div>
     <div class="diff-screen-sub">Choose difficulty</div>
-    <button class="diff-btn easy" onclick="Menu.startVsAI('easy')">
-      <div class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="26" height="26"><path d="M12 2a7 7 0 0 1 7 7c0 5-7 13-7 13S5 14 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5"/></svg></div>
-      <div class="dl"><div class="dl-name">Easy</div><div class="dl-desc">Random legal plays — perfect for learning</div></div>
-    </button>
-    <button class="diff-btn medium" onclick="Menu.startVsAI('medium')">
-      <div class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="26" height="26"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
-      <div class="dl"><div class="dl-name">Medium</div><div class="dl-desc">Smart heuristics — a solid challenge</div></div>
-    </button>
-    <button class="diff-btn hard" onclick="Menu.startVsAI('hard')">
-      <div class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="26" height="26"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
-      <div class="dl"><div class="dl-name">Hard</div><div class="dl-desc">Card-counting AI — plays to win tens</div></div>
-    </button>
+    <button class="diff-btn easy" onclick="Menu.startVsAI('easy')"><div class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="26" height="26"><path d="M12 2a7 7 0 0 1 7 7c0 5-7 13-7 13S5 14 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5"/></svg></div><div class="dl"><div class="dl-name">Easy</div><div class="dl-desc">Random legal plays — perfect for learning</div></div></button>
+    <button class="diff-btn medium" onclick="Menu.startVsAI('medium')"><div class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="26" height="26"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="dl"><div class="dl-name">Medium</div><div class="dl-desc">Smart heuristics — a solid challenge</div></div></button>
+    <button class="diff-btn hard" onclick="Menu.startVsAI('hard')"><div class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="26" height="26"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><div class="dl"><div class="dl-name">Hard</div><div class="dl-desc">Card-counting AI — plays to win tens</div></div></button>
   </div>
 
-  <!-- ── Coop Mode hub ── -->
   <div class="menu-panel" id="screen-coop" style="display:none">
-    <div class="panel-header">
-      <button class="diff-back-btn" onclick="Menu.showScreen('main')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
-      <span class="diff-screen-title">Coop Mode</span>
-    </div>
+    <div class="panel-header"><button class="diff-back-btn" onclick="Menu.showScreen('main')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button><span class="diff-screen-title">Coop Mode</span></div>
     <div class="diff-screen-sub">Play with friends on the same network</div>
-    <button class="diff-btn" style="border-color:rgba(201,135,58,.4)" onclick="Menu.showCreateRoom()">
-      <div class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="26" height="26"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-      <div class="dl"><div class="dl-name">Create Private Room</div><div class="dl-desc">Generate a code and set up seats</div></div>
-    </button>
-    <button class="diff-btn" style="border-color:rgba(91,164,212,.4)" onclick="Menu.showJoinRoom()">
-      <div class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="26" height="26"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg></div>
-      <div class="dl"><div class="dl-name">Join Private Room</div><div class="dl-desc">Enter a 6-character room code</div></div>
-    </button>
+    <button class="diff-btn" style="border-color:rgba(201,135,58,.4)" onclick="Menu.showCreateRoom()"><div class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="26" height="26"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><div class="dl"><div class="dl-name">Create Private Room</div><div class="dl-desc">Generate a code and set up seats</div></div></button>
+    <button class="diff-btn" style="border-color:rgba(91,164,212,.4)" onclick="Menu.showJoinRoom()"><div class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="26" height="26"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg></div><div class="dl"><div class="dl-name">Join Private Room</div><div class="dl-desc">Enter a 6-character room code</div></div></button>
   </div>
 
-  <!-- ── Name entry (shared) ── -->
   <div class="menu-panel" id="screen-name-entry" style="display:none">
-    <div class="panel-header">
-      <button class="diff-back-btn" id="name-back-btn" onclick="Menu.showScreen('coop')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
-      <span class="diff-screen-title">Your Name</span>
-    </div>
+    <div class="panel-header"><button class="diff-back-btn" id="name-back-btn" onclick="Menu.showScreen('coop')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button><span class="diff-screen-title">Your Name</span></div>
     <div class="diff-screen-sub">How should others see you?</div>
-    <div class="name-entry-wrap">
-      <input id="name-input" class="name-input" type="text" maxlength="20"
-        placeholder="Enter your name…"
-        onkeydown="if(event.key==='Enter')Menu.confirmName()">
-      <div class="name-hint">Max 20 characters</div>
-    </div>
-    <button class="menu-btn primary-btn" onclick="Menu.confirmName()" style="margin-top:16px">
-      <svg class="mb-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-      Continue
-    </button>
+    <div class="name-entry-wrap"><input id="name-input" class="name-input" type="text" maxlength="20" placeholder="Enter your name…" onkeydown="if(event.key==='Enter')Menu.confirmName()"><div class="name-hint">Max 20 characters</div></div>
+    <button class="menu-btn primary-btn" onclick="Menu.confirmName()" style="margin-top:16px"><svg class="mb-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Continue</button>
   </div>
 
-  <!-- ── Join room ── -->
   <div class="menu-panel" id="screen-join-room" style="display:none">
-    <div class="panel-header">
-      <button class="diff-back-btn" onclick="Menu.showScreen('coop')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
-      <span class="diff-screen-title">Join Room</span>
-    </div>
+    <div class="panel-header"><button class="diff-back-btn" onclick="Menu.showScreen('coop')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button><span class="diff-screen-title">Join Room</span></div>
     <div class="diff-screen-sub">Enter the 6-character room code</div>
-    <div class="name-entry-wrap">
-      <input id="room-code-input" class="name-input"
-        type="text" maxlength="6" placeholder="MIZO42"
-        style="text-transform:uppercase;letter-spacing:.22em;text-align:center;font-size:24px;font-weight:700"
-        oninput="this.value=this.value.toUpperCase()"
-        onkeydown="if(event.key==='Enter')Menu.joinRoom()">
-    </div>
-    <button class="menu-btn primary-btn" onclick="Menu.joinRoom()" style="margin-top:16px">
-      <svg class="mb-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-      Join
-    </button>
+    <div class="name-entry-wrap"><input id="room-code-input" class="name-input" type="text" maxlength="6" placeholder="MIZO42" style="text-transform:uppercase;letter-spacing:.22em;text-align:center;font-size:24px;font-weight:700" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')Menu.joinRoom()"></div>
+    <button class="menu-btn primary-btn" onclick="Menu.joinRoom()" style="margin-top:16px"><svg class="mb-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>Join</button>
   </div>
 
-  <!-- ── Choose a room seat before joining / while waiting ── -->
   <div class="menu-panel" id="screen-choose-seat" style="display:none">
-    <div class="panel-header">
-      <button class="diff-back-btn" onclick="Menu.backFromSeatPicker()" aria-label="Back">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      </button>
-      <span class="diff-screen-title">Choose Your Seat</span>
-    </div>
+    <div class="panel-header"><button class="diff-back-btn" onclick="Menu.backFromSeatPicker()" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button><span class="diff-screen-title">Choose Your Seat</span></div>
     <div class="diff-screen-sub" id="seat-picker-subtitle">Choose any available seat at the table.</div>
-    <div id="room-seat-picker" class="room-seat-picker" aria-live="polite">
-      <div class="seat-picker-loading">Checking available seats…</div>
-    </div>
+    <div id="room-seat-picker" class="room-seat-picker" aria-live="polite"><div class="seat-picker-loading">Checking available seats…</div></div>
     <div class="seat-picker-footnote">Occupied seats and the host seat cannot be selected.</div>
   </div>
 
-  <!-- ── Options ── -->
   <div class="menu-panel" id="screen-options" style="display:none">
-    <div class="panel-header">
-      <button class="diff-back-btn" onclick="Menu.showScreen('main')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
-      <span class="diff-screen-title">Options</span>
-    </div>
+    <div class="panel-header"><button class="diff-back-btn" onclick="Menu.showScreen('main')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button><span class="diff-screen-title">Options</span></div>
     <div class="opts-screen">
       <div class="opts-section-label">Sound</div>
-      <div class="opts-row">
-        <div class="opts-row-label">Music</div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <label class="toggle-wrap"><input type="checkbox" id="opt-music" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
-          <span class="toggle-on-label" id="opt-music-lbl">On</span>
-        </div>
-      </div>
-      <div class="opts-row">
-        <div class="opts-row-label">Sound effects</div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <label class="toggle-wrap"><input type="checkbox" id="opt-sfx" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
-          <span class="toggle-on-label" id="opt-sfx-lbl">On</span>
-        </div>
-      </div>
-      <div class="opts-row">
-        <div class="opts-row-label">Volume</div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <input type="range" class="vol-slider" id="opt-vol" min="0" max="100" value="47">
-          <span class="vol-pct" id="opt-vol-lbl">47%</span>
-        </div>
-      </div>
+      <div class="opts-row"><div class="opts-row-label">Music</div><div style="display:flex;align-items:center;gap:8px"><label class="toggle-wrap"><input type="checkbox" id="opt-music" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label><span class="toggle-on-label" id="opt-music-lbl">On</span></div></div>
+      <div class="opts-row"><div class="opts-row-label">Sound effects</div><div style="display:flex;align-items:center;gap:8px"><label class="toggle-wrap"><input type="checkbox" id="opt-sfx" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label><span class="toggle-on-label" id="opt-sfx-lbl">On</span></div></div>
+      <div class="opts-row"><div class="opts-row-label">Volume</div><div style="display:flex;align-items:center;gap:8px"><input type="range" class="vol-slider" id="opt-vol" min="0" max="100" value="47"><span class="vol-pct" id="opt-vol-lbl">47%</span></div></div>
       <div class="opts-section-label">Language</div>
-      <div class="opts-row">
-        <div class="opts-row-label">Language</div>
-        <div class="seg-ctrl" id="opt-lang">
-          <button class="seg-btn" onclick="Menu.segSelect('opt-lang',this)">Mizo</button>
-          <button class="seg-btn" onclick="Menu.segSelect('opt-lang',this)">Hindi</button>
-          <button class="seg-btn active" onclick="Menu.segSelect('opt-lang',this)">English</button>
-        </div>
-      </div>
+      <div class="opts-row"><div class="opts-row-label">Language</div><div class="seg-ctrl" id="opt-lang"><button class="seg-btn" onclick="Menu.segSelect('opt-lang',this)">Mizo</button><button class="seg-btn" onclick="Menu.segSelect('opt-lang',this)">Hindi</button><button class="seg-btn active" onclick="Menu.segSelect('opt-lang',this)">English</button></div></div>
       <div class="opts-section-label">Card Style</div>
-      <div class="opts-row" style="align-items:flex-start">
-        <div class="opts-row-label">Back design</div>
-        <div class="card-style-row" id="opt-cardstyle">
-          <div class="card-thumb active" onclick="Menu.cardStyleSelect(this)"><div class="card-thumb-img classic">♠</div><div class="card-thumb-label">Classic</div></div>
-          <div class="card-thumb" onclick="Menu.cardStyleSelect(this)"><div class="card-thumb-img blue">♦</div><div class="card-thumb-label">Blue</div></div>
-          <div class="card-thumb" onclick="Menu.cardStyleSelect(this)"><div class="card-thumb-img dark">♦</div><div class="card-thumb-label">Dark</div></div>
-        </div>
-      </div>
-      <div class="opts-row">
-        <div class="opts-row-label">Card size</div>
-        <div class="seg-ctrl" id="opt-cardsize">
-          <button class="seg-btn" onclick="Menu.segSelect('opt-cardsize',this)">Small</button>
-          <button class="seg-btn active" onclick="Menu.segSelect('opt-cardsize',this)">Normal</button>
-          <button class="seg-btn" onclick="Menu.segSelect('opt-cardsize',this)">Large</button>
-        </div>
-      </div>
-      <div class="opts-actions">
-        <button class="opts-save-btn" onclick="Menu.saveOptions()">Save</button>
-        <button class="opts-cancel-btn" onclick="Menu.showScreen('main')">Cancel</button>
-      </div>
+      <div class="opts-row" style="align-items:flex-start"><div class="opts-row-label">Back design</div><div class="card-style-row" id="opt-cardstyle"><div class="card-thumb active" onclick="Menu.cardStyleSelect(this)"><div class="card-thumb-img classic">♠</div><div class="card-thumb-label">Classic</div></div><div class="card-thumb" onclick="Menu.cardStyleSelect(this)"><div class="card-thumb-img blue">♦</div><div class="card-thumb-label">Blue</div></div><div class="card-thumb" onclick="Menu.cardStyleSelect(this)"><div class="card-thumb-img dark">♦</div><div class="card-thumb-label">Dark</div></div></div></div>
+      <div class="opts-row"><div class="opts-row-label">Card size</div><div class="seg-ctrl" id="opt-cardsize"><button class="seg-btn" onclick="Menu.segSelect('opt-cardsize',this)">Small</button><button class="seg-btn active" onclick="Menu.segSelect('opt-cardsize',this)">Normal</button><button class="seg-btn" onclick="Menu.segSelect('opt-cardsize',this)">Large</button></div></div>
+      <div class="opts-actions"><button class="opts-save-btn" onclick="Menu.saveOptions()">Save</button><button class="opts-cancel-btn" onclick="Menu.showScreen('main')">Cancel</button></div>
     </div>
   </div>
-</div><!-- end #menu-overlay -->
+</div>
 
-<!-- ══════════════════════════════════════════════
-     GAME SCREEN
-══════════════════════════════════════════════ -->
 <div id="mobile-game-viewport">
 <div id="mobile-game-frame">
 <div id="game-top-bar">
-  <button class="gtb-btn" onclick="Menu.returnToMenu()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-  </button>
+  <button class="gtb-btn" onclick="Menu.returnToMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
   <span class="diff-badge" id="diff-badge-label"></span>
-  <div id="controls-inline">
-    <select id="diff-select" class="gtb-select">
-      <option value="easy">Easy</option>
-      <option value="medium" selected>Medium</option>
-      <option value="hard">Hard</option>
-    </select>
-    <select id="timer-select" class="gtb-select">
-      <option value="0">No timer</option>
-      <option value="15">15s</option>
-      <option value="20" selected>20s</option>
-      <option value="30">30s</option>
-    </select>
-    <button class="gtb-btn gold" onclick="Game.newGame()">New</button>
-    <button class="gtb-btn" onclick="Game.getHint()">Hint</button>
-  </div>
-  <button id="social-btn" class="gtb-btn" onclick="Game.toggleSocialPanel()" style="display:none">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-  </button>
+  <div id="controls-inline"><select id="diff-select" class="gtb-select"><option value="easy">Easy</option><option value="medium" selected>Medium</option><option value="hard">Hard</option></select><select id="timer-select" class="gtb-select"><option value="0">No timer</option><option value="15">15s</option><option value="20" selected>20s</option><option value="30">30s</option></select><button class="gtb-btn gold" onclick="Game.newGame()">New</button><button class="gtb-btn" onclick="Game.getHint()">Hint</button></div>
+  <button id="social-btn" class="gtb-btn" onclick="Game.toggleSocialPanel()" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
 </div>
-
 <div id="social-panel"></div>
 
 <div id="game-shell">
@@ -711,40 +226,39 @@ window.openIndawlchuhCoopHub = function () {
   <div id="deal-layer"></div>
   <div id="play-layer"></div>
 
-  <!-- Capture strip — Team A (top) -->
   <div id="capture-a" class="capture-strip">
-    <div class="cs-info">
-      <span class="cs-team team-a">A</span>
-      <span class="cs-tens" id="cap-a-tens">0 🔟</span>
-      <span class="cs-count" id="cap-a-count">0 cards</span>
-    </div>
+    <div class="cs-info"><span class="cs-team team-a">A</span><span class="cs-tens" id="cap-a-tens">0 🔟</span><span class="cs-count" id="cap-a-count">0 cards</span></div>
     <div class="cs-divider"></div>
     <div class="cs-fan" id="cap-a-fan"></div>
   </div>
 
-  <!-- Top player -->
   <div class="pzone" id="zone-top">
     <div class="pchip pchip-a"><span class="pc-name" id="pname-top">P2</span><span class="pc-cnt" id="cnt-top">13</span></div>
     <div id="room-seat-slot-2" class="room-seat-slot"></div>
     <div id="hand-top" class="back-fan"></div>
   </div>
 
-  <!-- Left player -->
   <div class="pzone pzone-side" id="zone-left">
     <div class="pchip pchip-b"><span class="pc-name" id="pname-left">P1</span><span class="pc-cnt" id="cnt-left">13</span></div>
     <div id="room-seat-slot-1" class="room-seat-slot"></div>
     <div id="hand-left" class="back-fan back-fan-v"></div>
   </div>
 
-  <!-- Right player -->
   <div class="pzone pzone-side" id="zone-right">
     <div class="pchip pchip-b"><span class="pc-name" id="pname-right">P3</span><span class="pc-cnt" id="cnt-right">13</span></div>
     <div id="room-seat-slot-3" class="room-seat-slot"></div>
     <div id="hand-right" class="back-fan back-fan-v"></div>
   </div>
 
-  <!-- Trick area -->
   <div id="trick-area">
+    <div id="room-center-hub" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); text-align:center; z-index:10; background:rgba(0,0,0,0.6); padding:20px; border-radius:15px; border:1px solid var(--gold);">
+      <div style="font-size:10px; color:var(--text-muted); font-weight:bold; letter-spacing:2px;">ROOM CODE</div>
+      <div class="rl-code" id="room-room-code" style="font-size:36px; margin:5px 0;">------</div>
+      <div style="display:flex; gap:10px; justify-content:center;">
+        <button class="rl-copy-btn" onclick="Menu.copyRoomCode()">Copy Code</button>
+        <button class="rl-copy-btn" onclick="Menu.copyInviteLink()">Copy Link</button>
+      </div>
+    </div>
     <div class="tslot" id="trick-top"></div>
     <div class="tslot" id="trick-left"></div>
     <div class="tslot" id="trick-right"></div>
@@ -754,77 +268,34 @@ window.openIndawlchuhCoopHub = function () {
     <div id="twflash"></div>
   </div>
 
-  <!-- Bottom: YOU -->
   <div id="zone-bottom">
     <div class="bottom-row-top">
       <div class="pchip pchip-you"><span class="pc-name" id="pname-you">You</span><span class="pc-cnt" id="cnt-you">13</span></div>
       <button id="room-change-seat-btn" type="button" onclick="Menu.openSeatChange()" style="display:none">↔ Change Seat</button>
       <div id="status-inline"></div>
       <button id="give-up-btn" onclick="Game.onGiveUp()" style="display:none">🏳 Concede</button>
+      <button class="rl-start-btn" id="room-start-btn" onclick="Menu.hostStartGame()" style="display:none; width: auto; padding: 5px 15px; margin-left:10px;">▶ Start Game</button>
     </div>
     <div id="hand-scroll"><div id="hand-row"></div></div>
   </div>
 
-  <!-- Capture strip — Team B (bottom) -->
   <div id="capture-b" class="capture-strip capture-strip-b">
-    <div class="cs-info">
-      <span class="cs-team team-b">B</span>
-      <span class="cs-tens" id="cap-b-tens">0 🔟</span>
-      <span class="cs-count" id="cap-b-count">0 cards</span>
-    </div>
+    <div class="cs-info"><span class="cs-team team-b">B</span><span class="cs-tens" id="cap-b-tens">0 🔟</span><span class="cs-count" id="cap-b-count">0 cards</span></div>
     <div class="cs-divider"></div>
     <div class="cs-fan" id="cap-b-fan"></div>
   </div>
-</div><!-- end #table -->
-
-<aside id="room-lobby-panel" aria-label="Private room controls">
-  <div class="rl-head">
-    <div class="rl-title">Private Room</div>
-    <button class="rl-leave" onclick="Menu.leaveRoom()">Leave</button>
-  </div>
-  <div class="rl-code-card">
-    <div class="rl-code-label">ROOM CODE</div>
-    <div class="rl-code" id="room-room-code">------</div>
-    <div class="rl-copy-row">
-      <button class="rl-copy-btn" onclick="Menu.copyRoomCode()">Copy Code</button>
-      <button class="rl-copy-btn" onclick="Menu.copyInviteLink()">Copy Invite Link</button>
-    </div>
-  </div>
-  <div class="rl-section-label">Room status</div>
-  <div class="rl-hint" id="room-lobby-hint">Guests enter as spectators, then choose an available seat.</div>
-  <div class="rl-spectator-head"><span class="rl-section-label">Spectator Lobby</span><span class="rl-spectator-count" id="room-spectator-count">0</span></div>
-  <div id="room-spectator-list" class="rl-spectator-list" aria-live="polite"><div class="rl-no-spectators">No spectators waiting</div></div>
-  <div class="rl-hint rl-start-rule">The host can start only when all four seats are filled by players or bots. Spectators can keep watching after the game starts.</div>
-  <button class="rl-start-btn" id="room-start-btn" onclick="Menu.hostStartGame()">▶ Start Game</button>
-</aside>
-</div><!-- end #game-shell -->
-<div id="timer-wrap"><div id="timer-bar"></div></div>
-</div><!-- end #mobile-game-frame -->
-</div><!-- end #mobile-game-viewport -->
-
-<div id="mobile-rotate-overlay" role="status" aria-live="polite" aria-label="Rotate your phone to landscape">
-  <div class="mro-card">
-    <div class="mro-icon" aria-hidden="true">
-      <svg viewBox="0 0 72 72" width="66" height="66" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="24" y="7" width="24" height="42" rx="5" transform="rotate(90 36 28)"/>
-        <path d="M16 55a24 24 0 0 0 39-4M55 51l1 9-9-1M56 17a24 24 0 0 0-39 4M17 21l-1-9 9 1"/>
-      </svg>
-    </div>
-    <div class="mro-title">Rotate your phone</div>
-    <div class="mro-subtitle">Indawlchuh is best played in landscape mode. Turn your phone sideways to continue.</div>
-  </div>
 </div>
+</div>
+<div id="timer-wrap"><div id="timer-bar"></div></div>
+</div>
+</div>
+
+<div id="mobile-rotate-overlay" role="status" aria-live="polite" aria-label="Rotate your phone to landscape"><div class="mro-card"><div class="mro-icon" aria-hidden="true"><svg viewBox="0 0 72 72" width="66" height="66" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><rect x="24" y="7" width="24" height="42" rx="5" transform="rotate(90 36 28)"/><path d="M16 55a24 24 0 0 0 39-4M55 51l1 9-9-1M56 17a24 24 0 0 0-39 4M17 21l-1-9 9 1"/></svg></div><div class="mro-title">Rotate your phone</div><div class="mro-subtitle">Indawlchuh is best played in landscape mode. Turn your phone sideways to continue.</div></div></div>
 
 <div id="concede-banner"></div>
 <div id="chat-log-wrap"><div id="chat-log-box"></div></div>
 
-<div id="drag-ghost">
-  <div><div class="rk" id="dg-rank-t"></div><div class="sk" id="dg-suit-t"></div></div>
-  <div class="sm" id="dg-suit-m"></div>
-  <div><div class="rk" id="dg-rank-b" style="transform:rotate(180deg)"></div>
-       <div class="sk" id="dg-suit-b" style="transform:rotate(180deg)"></div></div>
-</div>
-
+<div id="drag-ghost"><div><div class="rk" id="dg-rank-t"></div><div class="sk" id="dg-suit-t"></div></div><div class="sm" id="dg-suit-m"></div><div><div class="rk" id="dg-rank-b" style="transform:rotate(180deg)"></div><div class="sk" id="dg-suit-b" style="transform:rotate(180deg)"></div></div></div>
 
 <div id="status" style="display:none"></div>
 <div id="sidebar" style="display:none"><div id="log-box"></div><div id="score-bar"><div id="cnt-a">0</div><div id="cnt-b">0</div></div></div>
@@ -834,149 +305,37 @@ window.openIndawlchuhCoopHub = function () {
 
 <div id="sovl">
   <div class="scard">
-    <div class="scard-suits">♥ ♠ ♦ ♣</div>
-    <h2>Game Over</h2>
-    <div class="res" id="res-emoji"></div>
-    <div id="res-text"></div>
-    <div class="det" id="res-det"></div>
-    <div class="scard-actions">
-      <button class="primary" onclick="Game.newGame()">Play Again</button>
-      <button class="secondary" onclick="Menu.returnToMenu()">Menu</button>
-    </div>
+    <div class="scard-suits">♥ ♠ ♦ ♣</div><h2>Game Over</h2><div class="res" id="res-emoji"></div><div id="res-text"></div><div class="det" id="res-det"></div>
+    <div class="scard-actions"><button class="primary" onclick="Game.newGame()">Play Again</button><button class="secondary" onclick="Menu.returnToMenu()">Menu</button></div>
   </div>
 </div>
 
-<!-- Socket.IO client: official CDN with jsDelivr fallback. Keep this before api.js. -->
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-<script>
-if (typeof window.io === "undefined") {
-  document.write('<script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.7.2/dist/socket.io.min.js"><\/script>');
-}
-</script>
+<script>if (typeof window.io === "undefined") { document.write('<script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.7.2/dist/socket.io.min.js"><\/script>'); }</script>
 <script src="/static/api.js"></script>
 <script src="/static/mobile-scale.js"></script>
 <script src="/static/animations.js"></script>
 <script>
-window.CFG = {
-  SC: {"♠":"black","♣":"black","♥":"red","♦":"red"},
-  NM: ["You","P1","P2","P3"],
-  SEAT: {0:{x:.50,y:.93},1:{x:.06,y:.50},2:{x:.50,y:.06},3:{x:.94,y:.50}},
-  CW: 60, CH: 88,
-  DEAL_STAGGER: 30, AI_DELAY: 550, LINGER: 1400, FLASH: 950,
-  FLY_TIMEOUT: 8000, SLOT_RETRY: 5, ENTRY_TIMEOUT: 15000,
-  SUIT_ORDER: {"♠":0,"♣":1,"♥":2,"♦":3},
-  RANK_ORDER: {"A":14,"K":13,"Q":12,"J":11,"10":10,"9":9,"8":8,"7":7,"6":6,"5":5,"4":4,"3":3,"2":2}
-};
+window.CFG = { SC: {"♠":"black","♣":"black","♥":"red","♦":"red"}, NM: ["You","P1","P2","P3"], SEAT: {0:{x:.50,y:.93},1:{x:.06,y:.50},2:{x:.50,y:.06},3:{x:.94,y:.50}}, CW: 60, CH: 88, DEAL_STAGGER: 30, AI_DELAY: 550, LINGER: 1400, FLASH: 950, FLY_TIMEOUT: 8000, SLOT_RETRY: 5, ENTRY_TIMEOUT: 15000, SUIT_ORDER: {"♠":0,"♣":1,"♥":2,"♦":3}, RANK_ORDER: {"A":14,"K":13,"Q":12,"J":11,"10":10,"9":9,"8":8,"7":7,"6":6,"5":5,"4":4,"3":3,"2":2} };
 </script>
 <script src="/static/game.js"></script>
 <script src="/static/menu.js"></script>
 
-<!-- ══════════════════════════════════════════════════════════════
-     LOADING SCREEN CONTROLLER
-     Runs after menu.js so the menu is fully rendered underneath.
-     Fades out when window.load fires (or after a safety timeout),
-     with a minimum display time to avoid a jarring flash.
-     ══════════════════════════════════════════════════════════════ -->
 <script id="loading-screen-js">
 (function () {
-  const el     = document.getElementById('loading-screen');
-  const bar    = document.getElementById('loading-bar');
-  const pct    = document.getElementById('loading-pct');
-  const status = document.getElementById('loading-status');
+  const el = document.getElementById('loading-screen'); const bar = document.getElementById('loading-bar'); const pct = document.getElementById('loading-pct'); const status = document.getElementById('loading-status');
   if (!el || !bar || !pct || !status) return;
-
-  const MIN_MS = 1800;          // minimum time the loader is visible
-  const MAX_MS = 6000;          // hard safety cap
-  const start  = performance.now();
-  let target   = 0;             // 0..90 while loading, 100 when done
-  let shown    = 0;
-  let windowLoaded = false;
-  let finished = false;
-
-  const STATUS_STEPS = [
-    { at: 0,   text: 'Shuffling the deck…' },
-    { at: 30,  text: 'Dealing cards…'      },
-    { at: 60,  text: 'Polishing the tens…' },
-    { at: 88,  text: 'Almost ready…'       },
-    { at: 100, text: 'Ready!'              },
-  ];
-
-  function setStatusFor(value) {
-    let msg = STATUS_STEPS[0].text;
-    for (const step of STATUS_STEPS) {
-      if (value >= step.at) msg = step.text;
-    }
-    if (status.textContent !== msg) status.textContent = msg;
-  }
-
-  function tick() {
-    if (finished) return;
-    const delta = target - shown;
-    if (Math.abs(delta) < 0.5) {
-      shown = target;
-    } else {
-      shown += delta * 0.18;
-    }
-    bar.style.width = shown.toFixed(2) + '%';
-    pct.textContent = Math.round(shown) + '%';
-    setStatusFor(shown);
-    if (shown < target - 0.5) {
-      requestAnimationFrame(tick);
-    } else {
-      shown = target;
-      bar.style.width = shown.toFixed(2) + '%';
-      pct.textContent = Math.round(shown) + '%';
-    }
-  }
-
-  function rampTo(p) {
-    target = p;
-    requestAnimationFrame(tick);
-  }
-
-  // Ramp toward 90% over ~1.4s so the loader feels alive even on fast loads.
-  const rampStart = performance.now();
-  (function rampHalf() {
-    const t = Math.min(1, (performance.now() - rampStart) / 1400);
-    rampTo(90 * (1 - Math.pow(1 - t, 3)));   // ease-out cubic
-    if (t < 1) requestAnimationFrame(rampHalf);
-  })();
-
-  window.addEventListener('load', () => {
-    windowLoaded = true;
-    maybeFinish();
-  });
-  setTimeout(() => { windowLoaded = true; maybeFinish(); }, MAX_MS);
-
-  function maybeFinish() {
-    if (finished || !windowLoaded) return;
-    const elapsed = performance.now() - start;
-    const wait    = Math.max(0, MIN_MS - elapsed);
-    setTimeout(() => {
-      if (finished) return;
-      rampTo(100);
-      setTimeout(() => {
-        finished = true;
-        el.classList.add('done');
-        setTimeout(() => { el.style.display = 'none'; }, 600);
-      }, 450);
-    }, wait);
-  }
-
-  // Tap-to-skip once the minimum time has elapsed.
-  el.addEventListener('pointerdown', () => {
-    if (finished) return;
-    if (performance.now() - start < MIN_MS) return;
-    windowLoaded = true;
-    maybeFinish();
-  });
-
-  // Reveal the "Tap to continue" hint if we're past MIN_MS but load hasn't fired.
-  setTimeout(() => {
-    if (!finished && !windowLoaded) el.classList.add('ready');
-  }, MIN_MS + 400);
+  const MIN_MS = 1800; const MAX_MS = 6000; const start = performance.now(); let target = 0; let shown = 0; let windowLoaded = false; let finished = false;
+  const STATUS_STEPS = [{ at: 0, text: 'Shuffling the deck…' },{ at: 30, text: 'Dealing cards…' },{ at: 60, text: 'Polishing the tens…' },{ at: 88, text: 'Almost ready…' },{ at: 100, text: 'Ready!' }];
+  function setStatusFor(value) { let msg = STATUS_STEPS[0].text; for (const step of STATUS_STEPS) { if (value >= step.at) msg = step.text; } if (status.textContent !== msg) status.textContent = msg; }
+  function tick() { if (finished) return; const delta = target - shown; if (Math.abs(delta) < 0.5) { shown = target; } else { shown += delta * 0.18; } bar.style.width = shown.toFixed(2) + '%'; pct.textContent = Math.round(shown) + '%'; setStatusFor(shown); if (shown < target - 0.5) { requestAnimationFrame(tick); } else { shown = target; bar.style.width = shown.toFixed(2) + '%'; pct.textContent = Math.round(shown) + '%'; } }
+  function rampTo(p) { target = p; requestAnimationFrame(tick); }
+  const rampStart = performance.now(); (function rampHalf() { const t = Math.min(1, (performance.now() - rampStart) / 1400); rampTo(90 * (1 - Math.pow(1 - t, 3))); if (t < 1) requestAnimationFrame(rampHalf); })();
+  window.addEventListener('load', () => { windowLoaded = true; maybeFinish(); }); setTimeout(() => { windowLoaded = true; maybeFinish(); }, MAX_MS);
+  function maybeFinish() { if (finished || !windowLoaded) return; const elapsed = performance.now() - start; const wait = Math.max(0, MIN_MS - elapsed); setTimeout(() => { if (finished) return; rampTo(100); setTimeout(() => { finished = true; el.classList.add('done'); setTimeout(() => { el.style.display = 'none'; }, 600); }, 450); }, wait); }
+  el.addEventListener('pointerdown', () => { if (finished) return; if (performance.now() - start < MIN_MS) return; windowLoaded = true; maybeFinish(); });
+  setTimeout(() => { if (!finished && !windowLoaded) el.classList.add('ready'); }, MIN_MS + 400);
 })();
 </script>
-
 </body>
 </html>
