@@ -633,13 +633,12 @@ function renderOpponents() {
 
   // A small, lively turn highlight helps the table feel active. Keep this
   // visual-only and scoped to VS AI so Co-op presentation is untouched.
-  if (!State.isCoop && !State.roomId) {
-    const turnZones = {0:"#zone-bottom .pchip", 1:"#zone-left .pchip", 2:"#zone-top .pchip", 3:"#zone-right .pchip"};
-    Object.values(turnZones).forEach(selector => document.querySelector(selector)?.classList.remove("is-active-turn"));
-    const activeSelector = turnZones[State.data.whose_turn];
-    if (State.data.phase !== "done" && activeSelector) {
-      document.querySelector(activeSelector)?.classList.add("is-active-turn");
-    }
+   // Lively turn highlight for ALL modes
+  const turnZones = {0:"#zone-bottom .pchip", 1:"#zone-left .pchip", 2:"#zone-top .pchip", 3:"#zone-right .pchip"};
+  Object.values(turnZones).forEach(selector => document.querySelector(selector)?.classList.remove("is-active-turn"));
+  const activeSelector = turnZones[State.data.whose_turn];
+  if (State.data.phase !== "done" && activeSelector) {
+    document.querySelector(activeSelector)?.classList.add("is-active-turn");
   }
 
   [["left",1],["top",2],["right",3]].forEach(([zone, pid]) => {
