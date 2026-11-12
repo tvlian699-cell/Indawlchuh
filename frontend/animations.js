@@ -186,7 +186,7 @@ const Anim = {
     dealLayer.innerHTML = "";
   },
 
-  flyCard(pid, cs, isBack, onLand, options = {}) {
+   flyCard(pid, cs, isBack, onLand, options = {}) {
     const CFG = window.CFG;
     return new Promise(resolve => {
       const playLayer = document.getElementById("play-layer");
@@ -202,8 +202,6 @@ const Anim = {
         if (finished) return;
         finished = true;
         if (timeout) clearTimeout(timeout);
-        // Install the final table card before removing the moving layer. Both
-        // happen in one task, so there is no blank frame or visible duplicate.
         try { if (onLand) onLand(); }
         catch (err) { console.error("[Anim.flyCard] onLand failed:", err); }
         if (flyEl && flyEl.parentNode) flyEl.remove();
@@ -235,8 +233,10 @@ const Anim = {
 
       flyEl = isBack ? CardFace.createBack("fly-card") : CardFace.create(cs, "fly-card");
       Object.assign(flyEl.style, {
-        left: `${sx}px`, top: `${sy}px`, width: `${startW}px`, height: `${startH}px`,
-        zIndex: "60", transformOrigin: "center center", willChange: "left, top, width, height, transform",
+        position: "absolute",
+        left: "0px", top: "0px",
+        width: `${CW}px`, height: `${CH}px`,
+        zIndex: "60", transformOrigin: "center center", willChange: "transform",
         backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden"
       });
       playLayer.appendChild(flyEl);
@@ -248,19 +248,30 @@ const Anim = {
       }, CFG.FLY_TIMEOUT || 8000);
 
       try {
+        const scale0X = startW / CW;
+        const scale0Y = startH / CH;
+        const scale1X = midW / CW;
+        const scale1Y = midH / CH;
+
+        const tx0 = sx + (startW - CW) / 2;
+        const ty0 = sy + (startH - CH) / 2;
+        const tx1 = midX + (midW - CW) / 2;
+        const ty1 = midY + (midH - CH) / 2;
+        const tx2 = ex;
+        const ty2 = ey;
+
         const keyframes = [
           {
-            left: `${sx}px`, top: `${sy}px`, width: `${startW}px`, height: `${startH}px`,
-            transform: hasDragOrigin ? "rotateZ(5deg) scale(1.04)" : "rotateZ(0deg) scale(1)",
+            transform: `translate(${tx0}px, ${ty0}px) scale(${scale0X}, ${scale0Y}) rotateZ(${hasDragOrigin ? 5 : 0}deg)`,
             opacity: 1, offset: 0
           },
           {
-            left: `${midX}px`, top: `${midY}px`, width: `${midW}px`, height: `${midH}px`,
-            transform: "rotateZ(-1.5deg) scale(1.06)", opacity: 1, offset: 0.68
+            transform: `translate(${tx1}px, ${ty1}px) scale(${scale1X}, ${scale1Y}) rotateZ(-1.5deg)`,
+            opacity: 1, offset: 0.68
           },
           {
-            left: `${ex}px`, top: `${ey}px`, width: `${CW}px`, height: `${CH}px`,
-            transform: "rotateZ(0deg) scale(1)", opacity: 1, offset: 1
+            transform: `translate(${tx2}px, ${ty2}px) scale(1, 1) rotateZ(0deg)`,
+            opacity: 1, offset: 1
           }
         ];
         anim = flyEl.animate(keyframes, {
