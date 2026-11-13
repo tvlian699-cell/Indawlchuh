@@ -1984,7 +1984,7 @@ body.mobile-room-mode #drag-ghost {
   align-items: center;
   gap: 7px;
   min-width: 0;
-  height: 40px;
+  height: 42px;
   overflow-x: auto;
   overflow-y: hidden;
   padding: 0 3px;
@@ -1994,9 +1994,9 @@ body.mobile-room-mode #drag-ghost {
 .cs-fan::-webkit-scrollbar { display: none; }
 .cs-capture-group {
   position: relative;
-  flex: 0 0 55px;
-  width: 55px;
-  height: 38px;
+  flex: 0 0 58px;
+  width: 58px;
+  height: 42px;
   overflow: visible;
   border: 1px solid rgba(239,215,155,.19);
   border-radius: 6px;
@@ -2094,9 +2094,11 @@ body.mobile-room-mode #drag-ghost {
 /* A landscape phone gets a protected centre row for the four played cards.
    The trick no longer spans the top player's row and the bottom hand row. */
 @media (orientation: landscape) and (pointer: coarse) {
+  /* Five reserved rows: top capture, top player, central trick, human hand,
+     bottom capture. The trick cards can no longer intrude into either hand. */
   body.mobile-room-mode #table {
-    grid-template-columns: clamp(88px, 10vw, 128px) minmax(0, 1fr) clamp(88px, 10vw, 128px) !important;
-    grid-template-rows: 48px minmax(38px, auto) minmax(160px, 1fr) auto 48px !important;
+    grid-template-columns: clamp(104px, 10vw, 136px) minmax(0, 1fr) clamp(104px, 10vw, 136px) !important;
+    grid-template-rows: 48px minmax(50px, auto) minmax(272px, 1fr) minmax(132px, auto) 48px !important;
   }
   body.mobile-room-mode #capture-a,
   body.mobile-room-mode #capture-b {
@@ -2107,60 +2109,105 @@ body.mobile-room-mode #drag-ghost {
   }
   body.mobile-room-mode .cs-info { min-width: 52px; }
   body.mobile-room-mode .cs-divider { height: 34px; }
-  body.mobile-room-mode .cs-fan { height: 40px; }
+  body.mobile-room-mode .cs-fan { height: 42px; }
+
+  /* Match the 60x88 game cards exactly to their trick slots. In particular,
+     the top slot no longer hangs upward into the top player's card fan. */
   body.mobile-room-mode #trick-area {
     grid-row: 3 / 4 !important;
     width: 100% !important;
     max-width: 360px;
-    height: 100% !important;
-    max-height: 280px;
+    height: 272px !important;
+    max-height: 272px !important;
     padding: 0 !important;
+    grid-template-columns: 68px 60px 68px !important;
+    grid-template-rows: 88px 96px 88px !important;
     align-self: center;
     justify-self: center;
+  }
+  body.mobile-room-mode #trick-area > .tslot {
+    width: 60px;
+    height: 88px;
   }
   body.mobile-room-mode #trick-area::before {
     width: min(76%, 270px);
     height: min(68%, 184px);
   }
+
+  /* Side players occupy only the outer columns. Explicit ID selectors are
+     intentional: older #zone-left/#zone-right !important rules otherwise
+     outrank the generic .pzone-side centring rule. */
   body.mobile-room-mode .pzone-side {
     min-width: 0;
     padding-left: 5px;
     padding-right: 5px;
     align-items: center;
     justify-content: center !important;
+    gap: 6px;
   }
-  body.mobile-room-mode #zone-left { grid-column: 1; grid-row: 2 / 5; }
-  body.mobile-room-mode #zone-right { grid-column: 3; grid-row: 2 / 5; }
+  body.mobile-room-mode #zone-left {
+    grid-column: 1;
+    grid-row: 2 / 5;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+  body.mobile-room-mode #zone-right {
+    grid-column: 3;
+    grid-row: 2 / 5;
+    justify-content: center !important;
+    align-items: center !important;
+  }
   body.mobile-room-mode .pchip {
-    max-width: 100%;
+    max-width: calc(100% - 2px);
     min-width: 0;
     gap: 4px;
     padding: 4px 6px;
   }
   body.mobile-room-mode .pc-name {
     min-width: 0;
-    max-width: 66px;
+    max-width: 78px;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   body.mobile-room-mode .pc-cnt { flex: 0 0 auto; }
   body.mobile-room-mode #zone-bottom {
+    grid-column: 1 / -1;
+    grid-row: 4;
     min-width: 0;
     padding: 2px 6px 5px !important;
     gap: 1px;
+  }
+  body.mobile-room-mode #zone-top {
+    grid-column: 2;
+    grid-row: 2;
+    min-width: 0;
+    justify-content: center;
   }
   body.mobile-room-mode #hand-scroll { min-width: 0; }
   body.mobile-room-mode #hand-row { padding: 2px 1px 3px; }
 }
 
 @media (orientation: landscape) and (pointer: coarse) and (max-height: 430px) {
+  /* Compact cross layout: left/right trick cards sit in the zero-height
+     middle track, while top/bottom cards keep their full 60x88 size. Since
+     the side cards occupy separate columns, they do not overlap those cards. */
   body.mobile-room-mode #table {
-    grid-template-rows: 44px minmax(34px, auto) minmax(132px, 1fr) auto 44px !important;
+    grid-template-rows: 34px minmax(50px, auto) minmax(176px, 1fr) minmax(130px, auto) 34px !important;
   }
   body.mobile-room-mode #capture-a,
-  body.mobile-room-mode #capture-b { height: 44px !important; min-height: 44px; }
-  body.mobile-room-mode .cs-fan { height: 40px; }
-  body.mobile-room-mode .cs-capture-group { width: 55px; height: 38px; }
-  body.mobile-room-mode #trick-area { max-height: 244px; }
+  body.mobile-room-mode #capture-b { height: 34px !important; min-height: 34px; padding-left:7px !important; padding-right:7px !important; }
+  body.mobile-room-mode .cs-fan { height: 34px; }
+  body.mobile-room-mode .cs-divider { height: 28px; }
+  body.mobile-room-mode .cs-capture-group { height: 34px; }
+  body.mobile-room-mode .cs-capture-card-slot,
+  body.mobile-room-mode .cs-capture-mini-card,
+  body.mobile-room-mode .cs-capture-card-side { width: 22px; height: 30px; }
+  body.mobile-room-mode #trick-area {
+    height: 176px !important;
+    max-height: 176px !important;
+    grid-template-rows: 88px 0 88px !important;
+  }
+  body.mobile-room-mode #trick-left,
+  body.mobile-room-mode #trick-right { align-self: center; }
   body.mobile-room-mode #zone-bottom { padding-bottom: 2px !important; }
 }
