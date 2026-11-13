@@ -1,22 +1,67 @@
 // file: frontend/pixi-renderer.js
-// Drop-in replacement for animations.js — same public API (Anim.deal,
-// Anim.flyCard, Anim.banner, Anim.flash, Anim.clearTrick) so game.js
-// needs ZERO changes. Renders cards on a PIXI canvas instead of DOM.
+// Pixi animation layer. Drop-in replacement for animations.js.
+// Fixes vs the old port:
+//  - Uses ResizeObserver (v7's resizeTo only listens to window resize, and
+//    #table starts as display:none, so the canvas stayed 0×0 forever).
+//  - flyCard now flies to the actual #trick-* DOM slot, not canvas center.
+//  - deal() targets the actual hand containers when they have size.
+//  - Canvas is z-indexed above #play-layer(50) / #zone-bottom(5).
+//  - autoDensity+resolution keeps text crisp on high-DPR phones.
 
 const PixiTable = (() => {
   let app = null;
-  const cardSprites = new Map(); // key: "seat-slot" -> PIXI.Container
 
   function init(containerId = "table") {
     const mount = document.getElementById(containerId);
+    if (!mount) { console.error("[PixiTable] mount not found:", containerId); return null; }
+    if (app) return app;
+
     app = new PIXI.Application({
-      resizeTo: mount, backgroundAlpha: 0, antialias: true
+      backgroundAlpha: 0,
+      antialias: true,
+      autoDensity: true,
+      resolution: window.devicePixelRatio || 1
     });
     mount.appendChild(app.view);
-    app.view.style.position = "absolute";
-    app.view.style.inset = "0";
-    app.view.style.pointerEvents = "none"; // let DOM hand/UI stay interactive
+
+    Object.assign(app.view.style, {
+      position: "absolute",
+      inset: "0",
+      zIndex: "55",              // above #play-layer (50) and #zone-bottom (5)
+      pointerEvents: "none"
+    });
+
+    const applySize = () => {
+      const w = Math.max(1, mount.clientWidth);
+      const h = Math.max(1, mount.clientHeight);
+      if (app.screen.width !== w || app.screen.height !== h) {
+        app.renderer.resize(w, h);
+      }
+    };
+
+    if (typeof ResizeObserver !== "undefined") {
+      const ro = new ResizeObserver(applySize);
+      ro.observe(mount);
+      app.__ro = ro;
+    }
+    window.addEventListener("resize", applySize);
+    document.addEventListener("fullscreenchange", applySize);
+    window.addEventListener("orientationchange", () => setTimeout(applySize, 120));
+
+    applySize();
     return app;
+  }
+
+  function ensureSized() {
+    if (!app) return false;
+    const mount = document.getElementById("table");
+    if (!mount) return false;
+    const w = Math.max(1, mount.clientWidth);
+    const h = Math.max(1, mount.clientHeight);
+    if (app.screen.width !== w || app.screen.height !== h) {
+      app.renderer.resize(w, h);
+    }
+    return true;
   }
 
   function suitColor(suit) {
@@ -39,30 +84,37 @@ const PixiTable = (() => {
       c.addChild(emblem);
     } else {
       const suit = cs.slice(-1), rank = cs.slice(0, -1);
-      const style = new PIXI.TextStyle({fontFamily: "Georgia", fontSize: 16, fill: suitColor(suit), fontWeight: "bold"});
+      const style = new PIXI.TextStyle({
+        fontFamily: "Georgia",
+        fontSize: 16,
+        fill: suitColor(suit),
+        fontWeight: "bold"
+      });
       const top = new PIXI.Text(`${rank}${suit}`, style);
       top.anchor.set(0.5); top.x = -w/2 + 14; top.y = -h/2 + 14;
-      const center = new PIXI.Text(suit, {fontFamily: "Georgia", fontSize: 28, fill: suitColor(suit)});
+      const center = new PIXI.Text(suit, {
+        fontFamily: "Georgia", fontSize: 28, fill: suitColor(suit)
+      });
       center.anchor.set(0.5);
       const bottom = new PIXI.Text(`${rank}${suit}`, style);
-      bottom.anchor.set(0.5); bottom.rotation = Math.PI; bottom.x = w/2 - 14; bottom.y = h/2 - 14;
+      bottom.anchor.set(0.5);
+      bottom.rotation = Math.PI;
+      bottom.x = w/2 - 14;
+      bottom.y = h/2 - 14;
       c.addChild(top, center, bottom);
     }
-    c.pivot.set(0, 0);
     return c;
   }
 
-  // Ease + animate a sprite from (sx,sy) to (ex,ey) over duration ms, then call onDone
   function tweenTo(sprite, sx, sy, ex, ey, duration, onDone) {
     sprite.x = sx; sprite.y = sy;
-    let t = 0;
     const start = performance.now();
     function frame(now) {
-      t = Math.min(1, (now - start) / duration);
+      const t = Math.min(1, (now - start) / duration);
       const ease = 1 - Math.pow(1 - t, 3);
       sprite.x = sx + (ex - sx) * ease;
-      sprite.y = sy + (ey - sy) * ease - Math.sin(t * Math.PI) * 30;
-      sprite.scale.set(1 + 0.15 * Math.sin(t * Math.PI));
+      sprite.y = sy + (ey - sy) * ease - Math.sin(t * Math.PI) * 24;
+      sprite.scale.set(1 + 0.10 * Math.sin(t * Math.PI));
       if (t < 1) requestAnimationFrame(frame);
       else { sprite.scale.set(1); onDone && onDone(); }
     }
@@ -70,36 +122,70 @@ const PixiTable = (() => {
   }
 
   function seatPos(pid) {
-    // Normalized table positions — same layout as CFG.SEAT used before
     const w = app.screen.width, h = app.screen.height;
-    const positions = {
-      0: {x: w/2, y: h - 60},
-      1: {x: 60,  y: h/2},
-      2: {x: w/2, y: 60},
-      3: {x: w - 60, y: h/2}
-    };
-    return positions[pid];
+    const s = (window.CFG && window.CFG.SEAT && window.CFG.SEAT[pid]) || {x: 0.5, y: 0.5};
+    return { x: w * s.x, y: h * s.y };
   }
+
+  function tableRectAndScale() {
+    const table = document.getElementById("table");
+    const rect = table.getBoundingClientRect();
+    const scale =
+      (window.MobileGameScale && window.MobileGameScale.getScale &&
+       window.MobileGameScale.getScale()) || 1;
+    return { rect, scale };
+  }
+
+  function centerInCanvas(el, tableRect, scale) {
+    const r = el.getBoundingClientRect();
+    return {
+      x: (r.left - tableRect.left + r.width  / 2) / scale,
+      y: (r.top  - tableRect.top  + r.height / 2) / scale
+    };
+  }
+
+  const TRICK_IDS = ["trick-bottom", "trick-left", "trick-top", "trick-right"];
 
   return {
     init,
 
     async deal() {
-      // Quick visual deal burst — 52 sprites fired from center to each seat
-      const center = {x: app.screen.width/2, y: app.screen.height/2};
+      if (!app) return;
+      ensureSized();
+      const { rect: tableRect, scale } = tableRectAndScale();
+      const center = { x: app.screen.width / 2, y: app.screen.height / 2 };
+
+      const targets = {
+        0: document.getElementById("hand-row"),
+        1: document.getElementById("hand-left"),
+        2: document.getElementById("hand-top"),
+        3: document.getElementById("hand-right")
+      };
+
       const order = [1, 2, 3, 0];
       const promises = [];
+
       for (let r = 0; r < 13; r++) {
         for (const pid of order) {
           promises.push(new Promise(resolve => {
             const sprite = makeCardSprite(null, true);
             app.stage.addChild(sprite);
-            const target = seatPos(pid);
+
+            let target = seatPos(pid);
+            const t = targets[pid];
+            if (t) {
+              const tr = t.getBoundingClientRect();
+              if (tr.width > 4 && tr.height > 4) {
+                target = centerInCanvas(t, tableRect, scale);
+              }
+            }
+
             tweenTo(sprite, center.x, center.y, target.x, target.y, 150, () => {
               app.stage.removeChild(sprite);
               resolve();
             });
           }));
+
           await new Promise(r => setTimeout(r, 30));
         }
       }
@@ -108,13 +194,36 @@ const PixiTable = (() => {
 
     flyCard(pid, cs, isBack, onLand, options = {}) {
       return new Promise(resolve => {
+        if (!app) {
+          try { onLand && onLand(); } catch (_) {}
+          resolve();
+          return;
+        }
+        ensureSized();
+
+        const { rect: tableRect, scale } = tableRectAndScale();
         const sprite = makeCardSprite(cs, isBack);
         app.stage.addChild(sprite);
-        const from = options?.fromRect
-          ? {x: options.fromRect.left + options.fromRect.width/2, y: options.fromRect.top + options.fromRect.height/2}
-          : seatPos(pid);
-        const to = {x: app.screen.width/2, y: app.screen.height/2};
-        const duration = options?.duration || 330;
+
+        // From: drag-release rect if provided, else hardcoded seat anchor.
+        let from;
+        if (options && options.fromRect && Number.isFinite(options.fromRect.left)) {
+          const fr = options.fromRect;
+          from = {
+            x: (fr.left - tableRect.left + fr.width  / 2) / scale,
+            y: (fr.top  - tableRect.top  + fr.height / 2) / scale
+          };
+        } else {
+          from = seatPos(pid);
+        }
+
+        // To: the real trick slot for this seat.
+        let to = { x: app.screen.width / 2, y: app.screen.height / 2 };
+        const slot = document.getElementById(TRICK_IDS[pid]);
+        if (slot) to = centerInCanvas(slot, tableRect, scale);
+
+        const duration = Number(options && options.duration) || 330;
+
         tweenTo(sprite, from.x, from.y, to.x, to.y, duration, () => {
           try { onLand && onLand(); } catch (e) { console.error(e); }
           app.stage.removeChild(sprite);
@@ -124,7 +233,6 @@ const PixiTable = (() => {
     },
 
     banner(pid, suit) {
-      // Keep using the existing DOM banner element — no need to rebuild in Pixi
       const el = document.getElementById("trump-banner");
       if (!el) return;
       el.textContent = `${["You","P1","P2","P3"][pid]} declared trump: ${suit}`;
@@ -140,12 +248,9 @@ const PixiTable = (() => {
       setTimeout(() => el.classList.remove("show"), 950);
     },
 
-    clearTrick() {
-      // Pixi sprites remove themselves after flyCard finishes — nothing to do
-    }
+    clearTrick() { /* sprites self-remove after flyCard */ }
   };
 })();
 
-// Expose under the SAME name game.js already expects
 window.Anim = PixiTable;
 window.PixiTable = PixiTable;
