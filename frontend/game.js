@@ -886,36 +886,66 @@ function makeCapturedTenCard(cardCode) {
 function makeCapturedTrickGroup(stack, trickIndex) {
   const group = document.createElement("div");
   group.className = "cs-capture-group";
-  const cards = Array.isArray(stack?.cards) ? stack.cards.map(String).slice(0, 4) : [];
-  const cardLabels = cards.length ? cards.join(" · ") : "Card details unavailable";
-  group.title = `Capture ${trickIndex + 1} — four-card trick: ${cardLabels}`;
-  group.setAttribute("aria-label", `Capture ${trickIndex + 1}, four cards`);
+
+  // A completed trick always contains four cards. Keep the four-card group
+  // intact even when an older snapshot does not include every card identity.
+  const sourceCards = Array.isArray(stack?.cards) ? stack.cards : [];
+  const cards = Array.from({length: 4}, (_, index) => {
+    const value = sourceCards[index];
+    return value == null ? null : String(value);
+  });
+  const knownCards = cards.filter(Boolean);
+  const tens = cards.filter(card => card && card.startsWith("10"));
+  const cardLabels = knownCards.length ? knownCards.join(" · ") : "card details unavailable";
+  const tenLabels = tens.length ? ` Face-up: ${tens.join(", ")}.` : "";
+
+  group.title = `Capture ${trickIndex + 1} — one four-card trick: ${cardLabels}.${tenLabels}`;
+  group.setAttribute("aria-label", `Capture ${trickIndex + 1}, four cards${tens.length ? `, ${tens.length} captured tens face up: ${tens.join(", ")}` : ""}`);
   group.dataset.captureIndex = String(trickIndex);
+  group.dataset.tenCount = String(tens.length);
 
-  // Every group always reserves four positions. Missing historical card data
-  // is represented by a back, never by silently shrinking the capture group.
-  for (let cardIndex = 0; cardIndex < 4; cardIndex++) {
-    const cardCode = cards[cardIndex] || null;
-    const cardSlot = cardCode && cardCode.startsWith("10")
-      ? makeCapturedTenCard(cardCode)
-      : document.createElement("div");
+  // Draw every non-ten first as a face-down card. Tens are drawn in a second
+  // pass above these backs so no later card can hide a captured ten.
+  const BACK_STEP = 7;
+  cards.forEach((cardCode, cardIndex) => {
+    if (cardCode && cardCode.startsWith("10")) return;
 
-    if (!(cardCode && cardCode.startsWith("10"))) {
-      cardSlot.className = "cs-capture-card-slot";
-      cardSlot.appendChild(makeCaptureCardBack());
-      cardSlot.setAttribute("aria-label", "Captured card face down");
-    }
-
-    // A short, even overlap makes the four cards read as one captured trick.
-    cardSlot.style.left = `${2 + cardIndex * 8}px`;
-    cardSlot.style.top = `${cardIndex % 2 ? 2 : 0}px`;
-    cardSlot.style.zIndex = String(cardIndex + 1);
+    const cardSlot = document.createElement("div");
+    cardSlot.className = "cs-capture-card-slot";
+    cardSlot.appendChild(makeCaptureCardBack());
+    cardSlot.setAttribute("aria-label", cardCode ? `${cardCode} captured face down` : "Captured card face down; identity unavailable");
+    cardSlot.style.left = `${2 + cardIndex * BACK_STEP}px`;
+    cardSlot.style.top = `${cardIndex % 2 ? 4 : 2}px`;
+    cardSlot.style.zIndex = String(1 + cardIndex);
     cardSlot.style.transform = `rotate(${[-4, -1, 1, 4][cardIndex]}deg)`;
     group.appendChild(cardSlot);
-  }
+  });
+
+  // Keep every ten face-up at the front of the same four-card capture group.
+  // When several tens occur in one trick, spread them enough to identify each
+  // suit while retaining a small overlap so they still read as one capture.
+  const MINI_CARD_W = 25;
+  const TEN_STEP = 22;
+  const groupWidth = Math.max(58, 31 + Math.max(0, tens.length - 1) * TEN_STEP);
+  const visibleTenWidth = tens.length
+    ? MINI_CARD_W + (tens.length - 1) * TEN_STEP
+    : 0;
+  const tenStart = (groupWidth - visibleTenWidth) / 2;
+  const tenRotations = [-1.5, -0.5, 0.5, 1.5];
+
+  tens.forEach((cardCode, tenIndex) => {
+    const cardSlot = makeCapturedTenCard(cardCode);
+    cardSlot.style.left = `${tenStart + tenIndex * TEN_STEP}px`;
+    cardSlot.style.top = "0px";
+    cardSlot.style.zIndex = String(20 + tenIndex);
+    cardSlot.style.transform = `rotate(${tenRotations[tenIndex] || 0}deg)`;
+    group.appendChild(cardSlot);
+  });
+
+  group.style.width = `${groupWidth}px`;
+  group.style.flexBasis = `${groupWidth}px`;
   return group;
 }
-
 function renderCaptureZone(team) {
   const fanEl   = document.getElementById(team === "A" ? "cap-a-fan" : "cap-b-fan");
   const tensEl  = document.getElementById(team === "A" ? "cap-a-tens" : "cap-b-tens");
