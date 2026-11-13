@@ -301,11 +301,21 @@ async function processEntry(e) {
 
 async function concludeTrick(winner) {
   const team       = (winner===0||winner===2) ? 'A' : 'B';
-  const trickCards = State._currentTrickCards.filter(c=>c);
+  // A capture is one completed trick: preserve all four played cards as one
+  // visual group. The number of cards in the group never changes the capture
+  // count; one completed four-card trick increments the count exactly once.
+  const trickCards = State._currentTrickCards.filter(Boolean).map(String).slice(0, 4);
+  if (trickCards.length !== 4) {
+    console.warn(`[Capture] Expected 4 cards in completed trick, received ${trickCards.length}`, State._currentTrickCards);
+  }
   State.captures[team]++;
-  const tensInTrick = trickCards.filter(c=>c.startsWith("10"));
+  const tensInTrick = trickCards.filter(card => card.startsWith("10"));
   if (tensInTrick.length) State.tens[team].push(...tensInTrick);
-  State.stacks[team].push({tens: tensInTrick});
+  State.stacks[team].push({
+    cards: trickCards,
+    tens: tensInTrick,
+    winner: Number(winner)
+  });
   renderCaptureZone(team);
   await sleep(1400); Anim.flash(winner); await sleep(950);
   Anim.clearTrick();
@@ -654,10 +664,16 @@ function renderOpponents() {
   if (hc) {
     const ids = {left:"cnt-left",top:"cnt-top",right:"cnt-right",you:"cnt-you"};
     const src = [hc[0],hc[1],hc[2],hc[3]];
-    if (document.getElementById(ids.left))  document.getElementById(ids.left).textContent  = `Cards: ${src[1]}`;
-    if (document.getElementById(ids.top))   document.getElementById(ids.top).textContent   = `Cards: ${src[2]}`;
-    if (document.getElementById(ids.right)) document.getElementById(ids.right).textContent = `Cards: ${src[3]}`;
-    if (document.getElementById(ids.you))   document.getElementById(ids.you).textContent   = `Cards: ${src[0]}`;
+    // Compact number badges preserve the count while giving names/avatars more
+    // room on narrow landscape phones. The full meaning remains accessible.
+    [[ids.left, src[1]], [ids.top, src[2]], [ids.right, src[3]], [ids.you, src[0]]]
+      .forEach(([id, count]) => {
+        const badge = document.getElementById(id);
+        if (!badge) return;
+        badge.textContent = String(count);
+        badge.title = `${count} cards remaining`;
+        badge.setAttribute("aria-label", `${count} cards remaining`);
+      });
   }
 }
 
@@ -796,163 +812,175 @@ function renderStatus() {
     : `<span style="color:var(--text-muted)">${names[wt]||"..."}'s turn</span>`;
 }
 
+function makeCaptureCardBack() {
+  const back = document.createElement("div");
+  back.className = "cs-capture-mini-card cs-capture-mini-back";
+  back.setAttribute("aria-label", "Captured card face down");
+  const emblem = document.createElement("span");
+  emblem.className = "cs-capture-mini-emblem";
+  emblem.textContent = "✦";
+  back.appendChild(emblem);
+  return back;
+}
+
+function makeCapturedTenCard(cardCode) {
+  const suit = String(cardCode).slice(-1);
+  const isRed = suit === "♥" || suit === "♦";
+  const slot = document.createElement("div");
+  slot.className = "cs-capture-card-slot is-ten";
+  slot.setAttribute("role", "img");
+  slot.setAttribute("aria-label", `Captured ten of ${suit}`);
+  slot.title = `${cardCode} captured`;
+
+  const flip = document.createElement("div");
+  flip.className = "cs-capture-card-flip";
+
+  const back = makeCaptureCardBack();
+  back.classList.add("cs-capture-card-side");
+
+  const face = document.createElement("div");
+  face.className = `cs-capture-mini-card cs-capture-mini-face ${isRed ? "red" : "black"}`;
+  face.style.transform = "rotateY(180deg)";
+
+  const top = document.createElement("span");
+  top.className = "cs-capture-mini-corner top";
+  top.textContent = `10${suit}`;
+  const centre = document.createElement("span");
+  centre.className = "cs-capture-mini-suit";
+  centre.textContent = suit;
+  const bottom = document.createElement("span");
+  bottom.className = "cs-capture-mini-corner bottom";
+  bottom.textContent = `10${suit}`;
+  face.append(top, centre, bottom);
+
+  [back, face].forEach(side => {
+    side.classList.add("cs-capture-card-side");
+    side.style.position = "absolute";
+    side.style.inset = "0";
+    side.style.backfaceVisibility = "hidden";
+    side.style.webkitBackfaceVisibility = "hidden";
+  });
+
+  flip.append(back, face);
+  slot.appendChild(flip);
+
+  // The 10 visibly turns from the same blue card back used by the deck.
+  // Only newly added capture groups are animated (see renderCaptureZone).
+  requestAnimationFrame(() => {
+    if (typeof flip.animate !== "function") {
+      flip.style.transform = "rotateY(180deg)";
+      return;
+    }
+    const animation = flip.animate(
+      [{ transform: "rotateY(0deg)" }, { transform: "rotateY(180deg)" }],
+      { duration: 560, easing: "cubic-bezier(.22,.72,.25,1)", fill: "forwards" }
+    );
+    animation.addEventListener("finish", () => {
+      flip.style.transform = "rotateY(180deg)";
+      animation.cancel();
+    }, { once: true });
+  });
+  return slot;
+}
+
+function makeCapturedTrickGroup(stack, trickIndex) {
+  const group = document.createElement("div");
+  group.className = "cs-capture-group";
+  const cards = Array.isArray(stack?.cards) ? stack.cards.map(String).slice(0, 4) : [];
+  const cardLabels = cards.length ? cards.join(" · ") : "Card details unavailable";
+  group.title = `Capture ${trickIndex + 1} — four-card trick: ${cardLabels}`;
+  group.setAttribute("aria-label", `Capture ${trickIndex + 1}, four cards`);
+  group.dataset.captureIndex = String(trickIndex);
+
+  // Every group always reserves four positions. Missing historical card data
+  // is represented by a back, never by silently shrinking the capture group.
+  for (let cardIndex = 0; cardIndex < 4; cardIndex++) {
+    const cardCode = cards[cardIndex] || null;
+    const cardSlot = cardCode && cardCode.startsWith("10")
+      ? makeCapturedTenCard(cardCode)
+      : document.createElement("div");
+
+    if (!(cardCode && cardCode.startsWith("10"))) {
+      cardSlot.className = "cs-capture-card-slot";
+      cardSlot.appendChild(makeCaptureCardBack());
+      cardSlot.setAttribute("aria-label", "Captured card face down");
+    }
+
+    // A short, even overlap makes the four cards read as one captured trick.
+    cardSlot.style.left = `${2 + cardIndex * 8}px`;
+    cardSlot.style.top = `${cardIndex % 2 ? 2 : 0}px`;
+    cardSlot.style.zIndex = String(cardIndex + 1);
+    cardSlot.style.transform = `rotate(${[-4, -1, 1, 4][cardIndex]}deg)`;
+    group.appendChild(cardSlot);
+  }
+  return group;
+}
+
 function renderCaptureZone(team) {
-  const fanEl   = document.getElementById(team==='A' ? "cap-a-fan"   : "cap-b-fan");
-  const tensEl  = document.getElementById(team==='A' ? "cap-a-tens"  : "cap-b-tens");
-  const countEl = document.getElementById(team==='A' ? "cap-a-count" : "cap-b-count");
+  const fanEl   = document.getElementById(team === "A" ? "cap-a-fan" : "cap-b-fan");
+  const tensEl  = document.getElementById(team === "A" ? "cap-a-tens" : "cap-b-tens");
+  const countEl = document.getElementById(team === "A" ? "cap-a-count" : "cap-b-count");
   if (!fanEl) return;
 
   const allCards = State.stacks[team] || [];
   const tenCount = (State.tens[team] || []).length;
-  const totalTricks = allCards.length;
+  const totalCaptures = allCards.length;
   const isVsAi = !State.isCoop && !State.roomId;
 
-  if (tensEl)  tensEl.textContent  = `${tenCount} 🔟`;
-  if (countEl) countEl.textContent = isVsAi
-    ? `${totalTricks} ${totalTricks === 1 ? "trick" : "tricks"}`
-    : `${totalTricks} cards`;
+  if (tensEl) {
+    tensEl.textContent = isVsAi ? `10s ${tenCount}/4` : `${tenCount} 🔟`;
+  }
+  if (countEl) {
+    countEl.textContent = `${totalCaptures} ${totalCaptures === 1 ? "capture" : "captures"}`;
+  }
 
-  if (!allCards.length) { fanEl.innerHTML = ''; return; }
-
-  // VS AI capture display. A normal trick is represented by one card back.
-  // If that trick captured one or more tens, show EVERY captured ten face-up,
-  // grouped together for that trick. Each ten gets its own visible offset and
-  // explicit stacking order so 3 or 4 tens cannot disappear underneath one
-  // another. Captured-trick and scoring totals are not changed.
   if (isVsAi) {
-    const groups = allCards.map((stack, trickIndex) => {
-      const tensInStack = Array.isArray(stack?.tens) ? stack.tens.map(String) : [];
-      return tensInStack.length
-        ? {type: "tens", cards: tensInStack, trickIndex}
-        : {type: "trick", cards: [], trickIndex};
+    const signatures = allCards.map(stack => {
+      const cards = Array.isArray(stack?.cards) ? stack.cards.map(String).slice(0, 4) : [];
+      return cards.length ? cards.join("|") : "unknown-four-card-capture";
     });
 
-    const CARD_W = 36;
-    const fanWidth = Math.max(fanEl.clientWidth || 200, 100);
-    const multiTenGroups = groups.filter(group => group.type === "tens" && group.cards.length > 1);
-    const maxTensInGroup = Math.max(1, ...multiTenGroups.map(group => group.cards.length));
-    // Leave enough of each card exposed to read its rank and suit. On a very
-    // narrow capture strip, compress the overlap but never omit a ten.
-    const tenStep = Math.max(12, Math.min(22,
-      Math.floor((fanWidth - CARD_W) / Math.max(1, maxTensInGroup - 1))
-    ));
-    const groupWidths = groups.map(group => group.type === "tens"
-      ? CARD_W + Math.max(0, group.cards.length - 1) * tenStep
-      : CARD_W
-    );
-    const widthWithoutGaps = groupWidths.reduce((sum, width) => sum + width, 0);
-    const gap = groups.length > 1
-      ? Math.max(0, Math.min(8, Math.floor((fanWidth - widthWithoutGaps) / (groups.length - 1))))
-      : 0;
+    let previous = [];
+    try { previous = JSON.parse(fanEl.dataset.captureGroups || "[]"); }
+    catch (_) { previous = []; }
+    const canAppend = previous.length <= signatures.length &&
+      previous.every((signature, index) => signature === signatures[index]);
 
-    fanEl.innerHTML = '';
-    fanEl.dataset.tenCardsRendered = String(groups.reduce(
-      (sum, group) => sum + (group.type === "tens" ? group.cards.length : 0), 0
-    ));
+    // Keep existing cards and their completed flip animations stable. Append
+    // only the new capture; rebuild only when a new game/reset changes history.
+    let firstNewGroup = 0;
+    if (!canAppend) {
+      fanEl.innerHTML = "";
+      firstNewGroup = 0;
+    } else {
+      firstNewGroup = previous.length;
+    }
 
-    let cursor = 0;
-    groups.forEach((group, groupIndex) => {
-      if (group.type === "trick") {
-        const el = document.createElement('div');
-        el.className = 'cs-card';
-        el.title = 'One captured trick';
-        el.dataset.trickIndex = String(group.trickIndex);
-        el.style.left = `${cursor}px`;
-        el.style.setProperty('z-index', String(groupIndex * 5 + 1), 'important');
-        fanEl.appendChild(el);
-        cursor += CARD_W + gap;
-        return;
-      }
-
-      // Each captured ten flips from the familiar card back to its real card
-      // face. Keep the complete card artwork from CardFace so the capture
-      // display matches the cards in the hand and on the table. All tens from
-      // this trick remain grouped; none are capped at two.
-      group.cards.forEach((cs, cardIndex) => {
-        const el = document.createElement('div');
-        el.className = 'cs-capture-ten-flip';
-        el.title = `${cs} · captured in trick ${group.trickIndex + 1}`;
-        el.dataset.card = cs;
-        el.dataset.trickIndex = String(group.trickIndex);
-        el.dataset.tenIndexInTrick = String(cardIndex);
-        Object.assign(el.style, {
-          position: 'absolute', top: '2px',
-          left: `${cursor + cardIndex * tenStep}px`,
-          width: `${CARD_W}px`, height: '54px',
-          overflow: 'visible', perspective: '650px',
-          pointerEvents: 'none'
-        });
-        el.style.setProperty('z-index', String(groupIndex * 5 + cardIndex + 2), 'important');
-
-        const inner = document.createElement('div');
-        inner.className = 'cs-capture-ten-inner';
-        Object.assign(inner.style, {
-          position: 'absolute', width: '60px', height: '88px',
-          left: '-12px', top: '-17px',
-          transformOrigin: 'center center', transformStyle: 'preserve-3d',
-          transform: 'rotateY(180deg) scale(.6)'
-        });
-
-        const back = window.CardFace?.createBack
-          ? window.CardFace.createBack('cs-capture-ten-back')
-          : document.createElement('div');
-        const face = window.CardFace?.create
-          ? window.CardFace.create(cs, 'cs-capture-ten-face')
-          : document.createElement('div');
-        [back, face].forEach(card => Object.assign(card.style, {
-          position: 'absolute', left: '0', top: '0',
-          width: '60px', height: '88px', margin: '0',
-          boxSizing: 'border-box', backfaceVisibility: 'hidden',
-          WebkitBackfaceVisibility: 'hidden'
-        }));
-        back.style.transform = 'rotateY(180deg)';
-        face.style.transform = 'rotateY(0deg)';
-        inner.append(back, face);
-        el.appendChild(inner);
-        fanEl.appendChild(el);
-
-        // Animate only after attachment so browsers reliably paint the back
-        // before revealing the face. Fall back to face-up if Web Animations is
-        // unavailable (older mobile browsers).
-        if (typeof inner.animate === 'function') {
-          const flip = inner.animate([
-            { transform: 'rotateY(180deg) scale(.6)' },
-            { transform: 'rotateY(0deg) scale(.6)' }
-          ], {
-            duration: 520,
-            delay: Math.min(cardIndex * 75, 225),
-            easing: 'cubic-bezier(.22,.72,.25,1)',
-            fill: 'forwards'
-          });
-          inner._captureTenFlip = flip;
-          flip.addEventListener('finish', () => {
-            inner.style.transform = 'rotateY(0deg) scale(.6)';
-            flip.cancel();
-            inner._captureTenFlip = null;
-          }, {once: true});
-        } else {
-          inner.style.transform = 'rotateY(0deg) scale(.6)';
-        }
-      });
-      cursor += groupWidths[groupIndex] + gap;
-    });
+    for (let index = firstNewGroup; index < allCards.length; index++) {
+      fanEl.appendChild(makeCapturedTrickGroup(allCards[index], index));
+    }
+    fanEl.dataset.captureGroups = JSON.stringify(signatures);
+    if (signatures.length > firstNewGroup) {
+      fanEl.scrollLeft = fanEl.scrollWidth;
+    }
+    if (!signatures.length) fanEl.innerHTML = "";
     return;
   }
 
-  // Keep the existing Co-op / multiplayer capture presentation untouched.
+  // Preserve the current Co-op / network-room capture presentation for now.
   const avail = Math.max(fanEl.clientWidth || 200, 100);
   const CARD_W = 28;
   const MAX_CARDS = 13;
   const step = Math.min(18, Math.max(8, Math.floor((avail - CARD_W) / MAX_CARDS)));
 
-  fanEl.innerHTML = '';
+  fanEl.innerHTML = "";
   allCards.forEach((stack, i) => {
     const tensInStack = stack.tens || [];
     if (tensInStack.length > 0) {
       tensInStack.forEach(cs => {
         const suit = cs.slice(-1), rank = cs.slice(0, -1);
-        const col  = window.CFG.SC[suit] || 'black';
-        const el   = document.createElement('div');
+        const col = window.CFG.SC[suit] || "black";
+        const el = document.createElement("div");
         el.className = `cs-card cs-ten ${col}`;
         el.style.cssText = `left:${i * step}px; z-index:${i + 20}`;
         el.title = cs;
@@ -960,14 +988,13 @@ function renderCaptureZone(team) {
         fanEl.appendChild(el);
       });
     } else {
-      const el = document.createElement('div');
-      el.className = 'cs-card';
+      const el = document.createElement("div");
+      el.className = "cs-card";
       el.style.cssText = `left:${i * step}px; z-index:${i + 1}`;
       fanEl.appendChild(el);
     }
   });
 }
-
 // ─── UI helpers ───────────────────────────────────────────────────────────────
 let timerIv=null,timerLeft=0,timerTotal=0,toastT=null;
 function timerSecs(){return parseInt(document.getElementById("timer-select").value,10);}
@@ -1103,8 +1130,9 @@ function hydrateSpectatorHistory(roomData) {
     if (entry?.trick_winner === undefined || entry?.trick_winner === null) continue;
 
     const team = Number(entry.trick_winner) % 2 === 0 ? "A" : "B";
-    const tens = trickCards.filter(card => card.startsWith("10"));
-    State.stacks[team].push({tens});
+    const cards = trickCards.slice(0, 4);
+    const tens = cards.filter(card => card.startsWith("10"));
+    State.stacks[team].push({cards, tens, winner: Number(entry.trick_winner)});
     State.tens[team].push(...tens);
     State.captures[team] += 1;
     trickCards = [];
@@ -1119,7 +1147,7 @@ function hydrateSpectatorHistory(roomData) {
   };
   for (const team of ["A", "B"]) {
     while (State.stacks[team].length < expected[team]) {
-      State.stacks[team].push({tens: []});
+      State.stacks[team].push({cards: [], tens: [], unknown: true});
     }
     State.captures[team] = Math.max(State.captures[team], expected[team]);
   }
