@@ -334,14 +334,13 @@ window.openIndawlchuhCoopHub = function () {
 <script>if (typeof window.io === "undefined") { document.write('<script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.7.2/dist/socket.io.min.js"><\/script>'); }</script>
 <script src="/static/api.js"></script>
 <script src="/static/mobile-scale.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.4.2/pixi.min.js"></script>
-<script src="/static/pixi-renderer.js"></script>
+<script src="/static/animations.js"></script>
 <script>
 window.CFG = { SC: {"♠":"black","♣":"black","♥":"red","♦":"red"}, NM: ["You","P1","P2","P3"], SEAT: {0:{x:.50,y:.93},1:{x:.06,y:.50},2:{x:.50,y:.06},3:{x:.94,y:.50}}, CW: 60, CH: 88, DEAL_STAGGER: 30, AI_DELAY: 550, LINGER: 1400, FLASH: 950, FLY_TIMEOUT: 8000, SLOT_RETRY: 5, ENTRY_TIMEOUT: 15000, SUIT_ORDER: {"♠":0,"♣":1,"♥":2,"♦":3}, RANK_ORDER: {"A":14,"K":13,"Q":12,"J":11,"10":10,"9":9,"8":8,"7":7,"6":6,"5":5,"4":4,"3":3,"2":2} };
 </script>
 <script src="/static/game.js"></script>
 <script src="/static/menu.js"></script>
-  <script>document.addEventListener("DOMContentLoaded", () => PixiTable.init("table"));</script>
+  <!--removed: PixiTable init - using animations.js -->
 
 <script id="loading-screen-js">
 (function () {
