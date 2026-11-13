@@ -56,7 +56,7 @@ const PixiTable = (() => {
 
   function drawCourtHalf(g, rank, w, h) {
     const c = COURT[rank] || COURT.K;
-    const sx = w / 100, sy = (h / 2) / 66;
+    const sx = w / 100, sy = (h / 2) / 67;
     g.lineStyle(1.2, 0x342c25, 1);
     g.beginFill(c.coat);
     g.drawRoundedRect(19*sx, 43*sy, 62*sx, 24*sy, 6);
@@ -121,13 +121,17 @@ const PixiTable = (() => {
     const topCorner = new PIXI.Text(`${rank}\n${suit}`, cornerStyle);
     topCorner.x = -w/2 + 5; topCorner.y = -h/2 + 4;
     const botCorner = new PIXI.Text(`${rank}\n${suit}`, cornerStyle);
-    botCorner.anchor.set(1,1); botCorner.x = w/2 - 5; botCorner.y = h/2 - 4; botCorner.rotation = Math.PI;
+    botCorner.anchor.set(0.5,0.5); botCorner.x = w/2 - 10; botCorner.y = h/2 - 12; botCorner.rotation = Math.PI;
     c.addChild(topCorner, botCorner);
 
-    if (rank === 'A') {
+       if (rank === 'A') {
       const mark = new PIXI.Text(suit, {fontFamily:"Georgia", fontSize: 30, fill: col});
       mark.anchor.set(0.5);
       c.addChild(mark);
+      const orn = new PIXI.Text("✦", {fontFamily:"Georgia", fontSize: 9, fill: 0xc7a45b});
+      orn.anchor.set(0.5);
+      orn.y = 20;
+      c.addChild(orn);
     } else if (COURT[rank]) {
       const art = makeCourtArt(rank, w - 10, h - 20);
       c.addChild(art);
@@ -136,8 +140,8 @@ const PixiTable = (() => {
       pts.forEach(([px, py, flip]) => {
         const pip = new PIXI.Text(suit, {fontFamily:"Georgia", fontSize: 11, fill: col});
         pip.anchor.set(0.5);
-        pip.x = -w/2 + (px/100)*w;
-        pip.y = -h/2 + (py/100)*h;
+        pip.x = -w/2 + w*0.14 + (px/100)*(w*0.72);
+        pip.y = -h/2 + h*0.17 + (py/100)*(h*0.66);
         if (flip) pip.rotation = Math.PI;
         c.addChild(pip);
       });
